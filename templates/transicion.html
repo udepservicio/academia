@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+  <title>Mis Estadísticas</title>
+  <link rel="icon" href="/static/logo.png" type="image/png" />
+
+  <!-- Fuentes externas -->
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Exo:wght@900&display=swap" rel="stylesheet" />
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Arial', sans-serif;
+      background-image: url("https://img.freepik.com/vector-premium/patron-fisuras-panal-hexagonal-blanco-negro-fondo-miel-mosaico-celular_434359-116.jpg?semt=ais_hybrid&w=740");
+      background-size: auto;
+      background-repeat: repeat;
+      background-position: top left;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .container {
+      background-color: rgba(255, 255, 255, 0.95);
+      width: 90%;
+      max-width: 400px;
+      padding: 30px 20px;
+      border-radius: 15px;
+      box-shadow: 4px 4px 0 #000;
+      text-align: center;
+      animation: fadeInUp 0.8s ease-out;
+    }
+
+    .volver {
+      position: absolute;
+      top: 15px;
+      left: 15px;
+      font-family: 'Exo', sans-serif;
+      font-weight: bold;
+      text-decoration: none;
+      color: #800000;
+      font-size: 16px;
+    }
+
+    .volver::before {
+      content: '◉';
+      margin-right: 5px;
+    }
+
+    h1 {
+      font-family: 'Exo', sans-serif;
+      font-size: 28px;
+      color: #01215c;
+      margin-bottom: 20px;
+    }
+
+    label {
+      display: block;
+      font-family: 'Arial', sans-serif;
+      color: #8B0000;
+      font-weight: bold;
+      margin-bottom: 6px;
+    }
+
+    input[type="text"] {
+      width: 100%;
+      padding: 12px;
+      font-size: 16px;
+      border: 2px solid #000;
+      border-radius: 10px;
+      margin-bottom: 20px;
+    }
+
+    .checkbox-container {
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      margin-bottom: 20px;
+    }
+
+    .checkbox-container input {
+      margin-right: 8px;
+      transform: scale(1.2);
+    }
+
+    .checkbox-container label {
+      font-size: 14px;
+      font-style: italic;
+      color: #808080;
+    }
+
+    .btn-ingresar {
+      font-family: 'Bebas Neue', sans-serif;
+      background-color: #035e59;
+      color: white;
+      font-weight: bold;
+      padding: 12px 24px;
+      border: none;
+      border-radius: 25px;
+      font-size: 18px;
+      box-shadow: 3px 3px 0px #000;
+      cursor: pointer;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      letter-spacing: 1px;
+    }
+
+    .btn-ingresar:hover {
+      transform: translateY(-2px);
+      box-shadow: 5px 5px 0px #000;
+    }
+
+    .btn-ingresar:active {
+      transform: translate(2px, 2px);
+      box-shadow: 1px 1px 0px #000;
+    }
+
+
+
+    .btn-volver {
+      position: fixed;
+      top: 16px;
+      left: 16px;
+      width: 40px;
+      height: 40px;
+      z-index: 1000;
+      border-radius: 50%;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+      background-color: white;
+      padding: 4px;
+      transition: transform 0.2s ease;
+    }
+
+    .btn-volver img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 50%;
+    }
+
+    .btn-volver:hover {
+      transform: scale(1.1);
+    }
+
+
+
+
+
+    @media (max-height: 500px) {
+      .container {
+        margin-top: 60px;
+        margin-bottom: 30px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <a href="/" class="btn-volver" title="Volver al inicio">
+    <img src="https://play-lh.googleusercontent.com/RnyHBmPzgs7yVW7-bO_B0xjxtPC7KcVZcnwhyyGGG_6s65ko4W-cHIAqHEpCTUYeBr0" alt="Volver" />
+  </a>   
+
+  <div class="container">
+    <h1>Mis Estadísticas</h1>
+    <input type="text" id="dni" placeholder="Ingrese su DNI">
+    <div class="checkbox-container">
+      <input type="checkbox" id="mantenerSesion">
+      <label for="mantenerSesion">Mantener iniciada mi sesión</label>
+    </div>
+    <button class="btn-ingresar" onclick="ingresar()">Ingresar</button>
+  </div>
+
+  <!-- MODAL EMERGENTE SI DNI NO ESTÁ INSCRITO -->
+  <div id="modalNoAutorizado" style="display:none; justify-content:center; align-items:center; position:fixed; top:0; left:0; width:100vw; height:100vh; backdrop-filter: blur(5px); background-color: rgba(0, 0, 0, 0.5); z-index:9999;">
+    <div style="background:#ffffff; padding:35px 25px 30px; border-radius:20px; width:320px; text-align:center; position:relative; box-shadow: 4px 4px 20px rgba(0,0,0,0.5); font-family:'Exo', sans-serif; animation: fadeInUp 0.6s ease;">
+
+      <button onclick="cerrarModalNoAutorizado()" style="position:absolute; top:10px; right:15px; background:transparent; border:none; font-size:22px; font-weight:bold; cursor:pointer;">×</button>
+
+      <img src="/static/logo.png" alt="Alumno no registrado" style="width:110px; height:110px; border-radius:50%; border:5px solid #ffffff; object-fit:cover; box-shadow:0 4px 12px rgba(0,0,0,0.4); margin-bottom:15px;">
+
+      <h3 style="font-family:'Bebas Neue', sans-serif; font-size:24px; color:#01215c; margin-bottom:12px;">Alumno no inscrito</h3>
+
+      <p style="font-size:15px; color:#333; margin-bottom:10px;">El alumno no se encuentra inscrito en <strong>Alfa Academy</strong>.</p>
+
+      <p style="font-size:14px; color:#555; margin-bottom:20px;">Para inscribirse a nuestros programas activos, contáctanos:</p>
+
+      <a href="https://wa.me/51939476507" target="_blank"
+        style="display:inline-block; margin-top:5px; padding:12px 22px; background:#016124; color:#fff; font-weight:600; border-radius:25px; text-decoration:none; font-size:15px; font-family:'sans-serif', sans-serif; letter-spacing:0.5px;">
+        Escribir por WhatsApp
+      </a>
+    </div>
+  </div>
+
+  <!-- SCRIPT DE VERIFICACIÓN -->
+
+  <script>
+    const alumnosPermitidos = [
+      { dni: "76212158", nombre: "Christian Saavedra", region: "Piura" },
+      { dni: "75743048", nombre: "Kiara Bravo", region: "Piura" },
+      { dni: "76212160", nombre: "Luis Huamán", region: "Cusco" },
+      { dni: "76212170", nombre: "Ana Quispe", region: "Arequipa" },
+      { dni: "77733043", nombre: "Cristina Poma", region: "Lima", sexo: "mujer" },
+      { dni: "77976108", nombre: "Fernando Caceres", region: "Lima", sexo: "hombre" },
+      { dni: "77444171", nombre: "Bianka Calsina", region: "Arequipa", sexo: "mujer" },
+      { dni: "77838075", nombre: "Kristhel Ccoa", region: "Arequipa", sexo: "mujer" },
+      { dni: "62981293", nombre: "Sheyla Gonzalez", region: "Tumbes", sexo: "mujer" },
+      { dni: "63174575", nombre: "Mullisaca Liccely", region: "Arequipa", sexo: "mujer" },
+      { dni: "62962855", nombre: "Luz Rosales", region: "Ica", sexo: "mujer" },
+      { dni: "62863372", nombre: "Sayumi Garcia", region: "Lima", sexo: "mujer" },
+      { dni: "63027708", nombre: "Dilberth Cardenas", region: "Lima", sexo: "hombre" },
+      { dni: "77857383", nombre: "Luis Garfias", region: "Lima", sexo: "hombre" },
+      { dni: "76889944", nombre: "Camila Milla", region: "Lima", sexo: "mujer" },
+      { dni: "77883407", nombre: "Jahaira Ramirez", region: "Lima", sexo: "mujer" },
+      { dni: "62968187", nombre: "Maria Reyes", region: "Lima", sexo: "mujer" },
+      { dni: "62887368", nombre: "Christian Quispe", region: "Arequipa", sexo: "hombre" },
+      { dni: "77195831", nombre: "Ariana Ayala", region: "Piura", sexo: "mujer" },
+      { dni: "77004431", nombre: "Bélgica Huerto", region: "Húanuco", sexo: "mujer" },
+      { dni: "63024327", nombre: "Angela Vallejo", region: "Ayacucho", sexo: "mujer" },
+      { dni: "77524259", nombre: "Aysel Zelada", region: "Cajamarca", sexo: "mujer" },
+      { dni: "76883820", nombre: "Dora Maquera", region: "Lambayeque", sexo: "mujer" },
+      { dni: "62952734", nombre: "Melani Mamani", region: "Tacna", sexo: "mujer" },
+      { dni: "77010974", nombre: "Amaru Vega", region: "Lima", sexo: "hombre" },
+      { dni: "62152736", nombre: "Andry Marcalaya", region: "Lima", sexo: "mujer" },
+      { dni: "77445436", nombre: "Anthony Coronado", region: "Lima", sexo: "hombre" },
+      { dni: "62849160", nombre: "Jeimy Valladolid", region: "Lima", sexo: "hombre" },
+      { dni: "62981531", nombre: "Max Atequipa", region: "Ica", sexo: "hombre" },
+      { dni: "62297551", nombre: "Siena Ronceros", region: "Huancavelica", sexo: "mujer" },
+      { dni: "63425714", nombre: "Miguel", region: "Lambayeque", sexo: "hombre" },
+      { dni: "77628131", nombre: "Jonatan Mendoza", region: "Lima", sexo: "hombre" },
+      { dni: "60061675", nombre: "Ronel Rafael", region: "Arequipa", sexo: "hombre" },
+      { dni: "77592128", nombre: "Briana Martínez", region: "Ucayali", sexo: "mujer" },
+      { dni: "77925372", nombre: "Alejandra Arteaga", region: "San Martin", sexo: "mujer" },
+      { dni: "62787174", nombre: "Aracely Flores", region: "Ica", sexo: "mujer" },
+      { dni: "62803900", nombre: "Ariana Flores", region: "Piura", sexo: "mujer" },
+      { dni: "63199077", nombre: "Annie Daylin", region: "Ica", sexo: "mujer" },
+      { dni: "77396091", nombre: "Leo Quispe", region: "Lima", sexo: "hombre" },
+      { dni: "80986203", nombre: "Oscar Montenegro", region: "Lima", sexo: "hombre" },
+      { dni: "77000763", nombre: "Jennifer Mejía", region: "Áncash", sexo: "mujer" },
+      { dni: "77263716", nombre: "Bruce Chevez", region: "Lambayeque", sexo: "hombre" },
+      { dni: "63093787", nombre: "Ana Espillico", region: "Tacna", sexo: "mujer" },
+      { dni: "62937147", nombre: "Fernando Iman", region: "Piura", sexo: "hombre" },
+      { dni: "63416416", nombre: "Yasmani Calizaya", region: "Piura", sexo: "hombre" },
+      { dni: "62761803", nombre: "Rafael Paucar", region: "Ayacucho", sexo: "hombre" }
+    ];
+  
+    function ingresar() {
+      const dni = document.getElementById("dni").value.trim();
+      const mantenerSesion = document.getElementById("mantenerSesion").checked;
+  
+      if (dni.length !== 8 || isNaN(dni)) {
+        alert("Por favor, ingrese un DNI válido de 8 dígitos.");
+        return;
+      }
+  
+      const alumno = alumnosPermitidos.find(a => a.dni === dni);
+  
+      if (alumno) {
+        // Guardar siempre el DNI, nombre y región
+        localStorage.setItem("dniAlumno", dni);
+        localStorage.setItem("nombreAlumno", alumno.nombre);
+        localStorage.setItem("regionAlumno", alumno.region);
+        localStorage.setItem("sexo", alumno.sexo);
+  
+        // Guardar acceso concedido si eligió mantener sesión
+        localStorage.setItem("acceso_concedido", mantenerSesion ? "si" : "no");
+  
+        // Redirigir al panel
+        window.location.href = "/panel";
+      } else {
+        document.getElementById("modalNoAutorizado").style.display = "flex";
+      }
+    }
+  
+    function cerrarModalNoAutorizado() {
+      document.getElementById("modalNoAutorizado").style.display = "none";
+    }
+  </script>
+
+
+
+</body>
+</html>
+
+
+
+
+
+

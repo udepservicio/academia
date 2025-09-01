@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Repositorio de Exámenes</title>
+  <link rel="icon" href="/static/logo.png" type="image/png" />
+
+  <!-- Fuentes externas -->
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Exo:wght@900&display=swap" rel="stylesheet" />
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Bebas Neue', sans-serif;
+      background-image: url("https://img.freepik.com/vector-premium/patron-fisuras-panal-hexagonal-blanco-negro-fondo-miel-mosaico-celular_434359-116.jpg?semt=ais_hybrid&w=740");
+      background-size: auto;
+      background-repeat: repeat;
+      background-position: top left;
+      background-color: #e2cece;
+      padding: 0 15px;
+    }
+
+
+
+    .btn-volver {
+      position: fixed;
+      top: 16px;
+      left: 16px;
+      width: 40px;
+      height: 40px;
+      z-index: 1000;
+      border-radius: 50%;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+      background-color: white;
+      padding: 4px;
+      transition: transform 0.2s ease;
+    }
+    
+    .btn-volver img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 50%;
+    }
+    
+    .btn-volver:hover {
+      transform: scale(1.1);
+    }
+
+
+
+    h1 {
+      font-family: 'Exo', sans-serif;
+      font-weight: 900;
+      font-size: 32px;
+      color: #01215c;
+      margin-top: 70px;
+      margin-bottom: 50px; /* 👈 Añade esto */
+      text-align: center;
+    }
+
+    .exam-grid {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 20px;
+    }
+
+    .exam-card {
+      background-color: rgba(255, 255, 255, 0.95);
+      border-radius: 12px;
+      box-shadow: 3px 3px 0px #000;
+      padding: 16px 12px 12px;
+      animation: fadeInUp 0.8s ease-out;
+      width: 350px;
+      text-align: center;
+      position: relative; /* necesario para overlay */
+      pointer-events: auto; /* por defecto permitir clicks */
+    }
+
+    .exam-card.bloqueado-total {
+      pointer-events: none; /* bloquea todo dentro */
+      position: relative;
+    }
+
+    .iframe-wrapper {
+      position: relative;
+      border-radius: 8px;
+      overflow: hidden;
+      border: 4px solid white;
+      background-color: white;
+    }
+
+    iframe {
+      width: 100%;
+      height: 360px;
+      border: none;
+    }
+
+    /* Overlay bloqueado que cubre todo el iframe */
+    .bloqueado-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: rgba(0, 0, 0, 0.6);
+      color: white;
+      font-size: 22px;
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 10;
+      pointer-events: auto; /* que capture eventos */
+      user-select: none;
+      display: none; /* oculto por defecto */
+    }
+
+    .exam-card.bloqueado-total .bloqueado-overlay {
+      display: flex; /* mostrar overlay cuando bloqueado */
+    }
+
+    .btn-descargar {
+      background-color: #02592a;
+      color: white;
+      font-weight: bold;
+      padding: 8px 16px;
+      border: none;
+      border-radius: 16px;
+      font-size: 16px;
+      box-shadow: 2px 2px 0px #000;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-block;
+      margin-top: 10px;
+      position: relative; /* para encima de overlay */
+      z-index: 5;
+      pointer-events: auto; /* siempre clickeable */
+    }
+
+    .btn-descargar:hover {
+      transform: translateY(-2px);
+      box-shadow: 4px 4px 0px #000;
+    }
+
+    .btn-descargar:active {
+      transform: translate(2px, 2px);
+      box-shadow: 1px 1px 0px #000;
+    }
+
+    .estadistica-final {
+      background-color: rgba(255, 255, 255, 0.95);
+      color: #4a1f46;
+      font-weight: bold;
+      font-size: 20px;
+      padding: 18px;
+      margin: 40px auto 20px;
+      border-radius: 15px;
+      box-shadow: 4px 4px 0px #000;
+      text-align: center;
+      max-width: 400px;
+    }
+
+    .social-icons {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      margin-bottom: 40px;
+    }
+
+    .social-icons a img {
+      width: 40px;
+      height: 40px;
+      transition: transform 0.2s ease;
+    }
+
+    .social-icons a img:hover {
+      transform: scale(1.2);
+    }
+
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @media (min-width: 768px) {
+      body {
+        padding: 0 30px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <script>
+    // const BLOQUEADO = true; // ⚠️⚠️ Cambia a true para bloquear ⚠️⚠️ *anterior*
+
+    const acceso = localStorage.getItem("acceso_concedido");
+    const BLOQUEADO = acceso !== "si"; // bloqueado si NO es "si"    
+
+    window.addEventListener("DOMContentLoaded", () => {
+      const cards = document.querySelectorAll(".exam-card");
+      cards.forEach(card => {
+        if (BLOQUEADO) {
+          card.classList.add("bloqueado-total");
+        } else {
+          card.classList.remove("bloqueado-total");
+        }
+      });
+
+      // Actualizar la estadística al cargar
+      actualizarDescargas();
+    });
+
+    function abrirExamen(id) {
+      if (BLOQUEADO) {
+        alert('Solo disponible para alumnos de Alfa Academy.');
+        return;
+      }
+      const url = `https://drive.google.com/uc?export=download&id=${id}`;
+      window.open(url, '_blank');
+    }
+
+    function actualizarDescargas() {
+      const inicio = new Date('2025-01-01T00:00:00');
+      const ahora = new Date();
+      const diffMs = ahora - inicio; // diferencia en milisegundos
+      const diffMinutos = Math.floor(diffMs / (1000 * 60));
+      const porcentaje = 0.04; // 4%
+      const descargas = Math.floor(diffMinutos * porcentaje);
+
+      const contenedor = document.getElementById('estadistica-final');
+      contenedor.innerHTML = `Alumnos que descargaron exámenes: <br /><strong>${descargas.toLocaleString()}</strong>`;
+    }
+  </script>
+
+
+  
+  <a href="/" class="btn-volver" title="Volver al inicio">
+    <img src="https://play-lh.googleusercontent.com/RnyHBmPzgs7yVW7-bO_B0xjxtPC7KcVZcnwhyyGGG_6s65ko4W-cHIAqHEpCTUYeBr0" alt="Volver" />
+  </a>  
+
+  <h1>Repositorio de Exámenes</h1>
+
+  <div class="exam-grid">
+
+    <div class="exam-card">
+      <div class="iframe-wrapper">
+        <iframe src="https://drive.google.com/file/d/1GjNZ5rfIxIrZM88OZXrgEQj8_l3ZOCvS/preview" allow="autoplay"></iframe>
+        <div class="bloqueado-overlay">🔒 BLOQUEADO</div> 
+      </div>
+      <a href="#" class="btn-descargar" onclick="abrirExamen('1GjNZ5rfIxIrZM88OZXrgEQj8_l3ZOCvS'); return false;">Ver Examen 2025</a>
+    </div>
+
+    <div class="exam-card">
+      <div class="iframe-wrapper">
+        <iframe src="https://drive.google.com/file/d/1Rn9xqp7Zjj85HHzv9TEqr6SJ1KhTpR8M/preview" allow="autoplay"></iframe>
+        <div class="bloqueado-overlay">🔒 BLOQUEADO</div>
+      </div>
+      <a href="#" class="btn-descargar" onclick="abrirExamen('1Rn9xqp7Zjj85HHzv9TEqr6SJ1KhTpR8M'); return false;">Ver Examen 2024</a>
+    </div>
+
+    <div class="exam-card">
+      <div class="iframe-wrapper">
+        <iframe src="https://drive.google.com/file/d/1fqDKWIZelmK5GHqH6qJL_Zl7hfzafrxq/preview" allow="autoplay"></iframe>
+        <div class="bloqueado-overlay">🔒 BLOQUEADO</div>
+      </div>
+      <a href="#" class="btn-descargar" onclick="abrirExamen('1fqDKWIZelmK5GHqH6qJL_Zl7hfzafrxq'); return false;">Ver Examen 2023</a>
+    </div>
+
+    <div class="exam-card">
+      <div class="iframe-wrapper">
+        <iframe src="https://drive.google.com/file/d/1O4M9NbwWgKkdiuhRxh5Q2yqRwGBvjMty/preview" allow="autoplay"></iframe>
+        <div class="bloqueado-overlay">🔒 BLOQUEADO</div>
+      </div>
+      <a href="#" class="btn-descargar" onclick="abrirExamen('1O4M9NbwWgKkdiuhRxh5Q2yqRwGBvjMty'); return false;">Ver Examen 2022</a>
+    </div>
+
+    <div class="exam-card">
+      <div class="iframe-wrapper">
+        <iframe src="https://drive.google.com/file/d/10GH2ifX-mGdfE85kokigTJqHNPE35egq/preview" allow="autoplay"></iframe>
+        <div class="bloqueado-overlay">🔒 BLOQUEADO</div>
+      </div>
+      <a href="#" class="btn-descargar" onclick="abrirExamen('10GH2ifX-mGdfE85kokigTJqHNPE35egq'); return false;">Ver Examen 2020</a>
+    </div>
+    <div class="exam-card">
+      <div class="iframe-wrapper">
+        <iframe src="https://drive.google.com/file/d/1y6PhxIVWQJzHy7vvb0_21J6-KVEUbuZ-/preview" allow="autoplay"></iframe>
+        <div class="bloqueado-overlay">🔒 BLOQUEADO</div>
+      </div>
+      <a href="#" class="btn-descargar" onclick="abrirExamen('1y6PhxIVWQJzHy7vvb0_21J6-KVEUbuZ-'); return false;">Ver Examen 2019</a>
+    </div>
+
+    <div class="exam-card">
+      <div class="iframe-wrapper">
+        <iframe src="https://drive.google.com/file/d/1k8JeUR0OopiD6wMomR9oopJ1oZcNMjIS/preview" allow="autoplay"></iframe>
+        <div class="bloqueado-overlay">🔒 BLOQUEADO</div>
+      </div>
+      <a href="#" class="btn-descargar" onclick="abrirExamen('1k8JeUR0OopiD6wMomR9oopJ1oZcNMjIS'); return false;">Ver Examen 2018</a>
+    </div>
+    <div class="exam-card">
+      <div class="iframe-wrapper">
+        <iframe src="https://drive.google.com/file/d/1YAiR9Uy9AIbJ-Y03xmnec-R_aTmU4pPJ/preview" allow="autoplay"></iframe>
+        <div class="bloqueado-overlay">🔒 BLOQUEADO</div>
+      </div>
+      <a href="#" class="btn-descargar" onclick="abrirExamen('1YAiR9Uy9AIbJ-Y03xmnec-R_aTmU4pPJ'); return false;">Ver Examen 2017</a>
+    </div>
+
+  </div>
+
+  <div class="estadistica-final" id="estadistica-final">
+    Alumnos que descargaron exámenes: <br /><strong>...</strong>
+  </div>
+
+  <div class="social-icons">
+    
+    <a href="https://www.youtube.com/@alfa_academy_coar" target="_blank"><img src="https://cdn-icons-png.flaticon.com/512/1384/1384060.png" alt="WhatsApp" /></a>
+  </div>
+
+</body>
+</html>

@@ -1,0 +1,512 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Perfil del Alumno</title>
+  <link rel="icon" href="/static/logo.png" type="image/png" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet" />
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      margin: 0;
+      padding: 40px 15px;
+      font-family: 'Poppins', sans-serif;
+      background: url("https://img.freepik.com/vector-premium/patron-fisuras-panal-hexagonal-blanco-negro-fondo-miel-mosaico-celular_434359-116.jpg?semt=ais_hybrid&w=740") repeat top left fixed;
+      background-size: auto;
+      display: flex;
+      justify-content: center;
+      animation: fadeIn 1.2s ease-in-out;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes slideUp {
+      from { transform: translateY(40px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+    .container {
+      width: 100%;
+      max-width: 1200px;
+      backdrop-filter: blur(10px);
+      background-color: rgba(255, 255, 255, 0.07);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 25px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
+      padding: 30px;
+    }
+
+    .btn-eliminar {
+      margin: 40px auto 0;
+      display: block;
+      padding: 12px 30px;
+      background-color: #ff3b3b;
+      color: white;
+      font-weight: bold;
+      border: none;
+      border-radius: 12px;
+      box-shadow: 2px 2px 6px rgba(0,0,0,0.3);
+      cursor: pointer;
+      font-size: 16px;
+      transition: all 0.3s ease;
+    }
+    
+    .btn-eliminar:hover {
+      background-color: #e10000;
+      transform: scale(1.05);
+    }
+
+
+
+
+
+
+
+    .btn-volver {
+      position: fixed;
+      top: 16px;
+      left: 16px;
+      width: 40px;
+      height: 40px;
+      z-index: 1000;
+      border-radius: 50%;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+      background-color: white;
+      padding: 4px;
+      transition: transform 0.2s ease;
+    }
+    
+    .btn-volver img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 50%;
+    }
+    
+    .btn-volver:hover {
+      transform: scale(1.1);
+    }
+
+
+
+
+
+    .perfil {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+  
+    .perfil img {
+      width: 130px;
+      height: 130px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 3px solid #0a0a0a;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+    }
+    .perfil h2 {
+      margin-top: 14px;
+      font-size: 22px;
+      color: #000000;
+      font-weight: 700;
+      text-shadow: 0 1px 3px rgba(0,0,0,0.5);
+    }
+    .grid {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+    .card {
+      background-color: rgba(255, 255, 255, 0.55); 
+      border-radius: 20px;
+      padding: 20px;
+      color: #000;
+      text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+      flex: 1;
+    }
+    .card h3 {
+      font-size: 18px;
+      margin-bottom: 12px;
+      color: #000000;
+      border-bottom: 1px solid #ccc;
+      padding-bottom: 6px;
+    }
+    .simulacro {
+      display: flex;
+      justify-content: space-between;
+      margin: 6px 0;
+      font-size: 15px;
+      font-weight: 500;
+    }
+    .bloqueado {
+      color: #023646;
+    }
+    .revancha-btn {
+      margin: 16px auto 0;
+      padding: 12px 28px;
+      background-color: rgba(223, 223, 223, 0.432);
+      border: 1.5px solid #ffffff;
+      font-weight: 600;
+      font-size: 15px;
+      border-radius: 25px;
+      box-shadow: 2px 2px 0px rgba(0,0,0,0.5);
+      color: #6100bb;
+      display: block;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .revancha-btn:hover {
+      background-color: rgba(255,255,255,0.3);
+      transform: translateY(-2px);
+    }
+
+    .tema {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin: 6px 0;
+    }
+    .barra {
+      width: 60%;
+      background-color: rgba(255, 255, 255, 0.2);
+      border: 1px solid #fff;
+      border-radius: 20px;
+      height: 18px;
+      overflow: hidden;
+    }
+    .progreso {
+      height: 100%;
+      
+      border-radius: 20px;
+      text-align: right;
+      color: white;
+      font-size: 12px;
+      padding-right: 5px;
+      line-height: 18px;
+      font-weight: 600;
+      transition: width 1.5s ease, background-color 0.6s ease;
+    }
+    .tema span {
+      width: 35%;
+      font-size: 14px;
+      font-weight: 500;
+    }
+    .loader {
+      display: inline-block;
+      width: 16px; height: 16px;
+      border: 3px solid #ccc;
+      border-top: 3px solid #007BFF;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    #dniForm {
+      text-align: center;
+      margin: 0 auto 20px auto;
+    }
+    #dniInput {
+      padding: 10px;
+      border-radius: 10px;
+      border: 1px solid #aaa;
+      font-size: 16px;
+      width: 200px;
+    }
+    
+    
+    select, .btn-primary {
+      width: 100%;
+      margin-top: 15px;
+      padding: 10px;
+      border-radius: 10px;
+      border: 1px solid #ccc;
+      font-family: 'Poppins';
+    }
+
+    .btn-primary {
+      background: #01215c;
+      color: white;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    
+    
+    #buscarBtn {
+      padding: 10px 18px;
+      margin-left: 8px;
+      font-size: 16px;
+      border-radius: 10px;
+      border: none;
+      background: #007BFF;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    @media (min-width: 768px) {
+      .grid {
+        flex-direction: row;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  
+  <div class="container">
+    <a href="/" class="btn-volver" title="Volver al inicio">
+      <img src="https://play-lh.googleusercontent.com/RnyHBmPzgs7yVW7-bO_B0xjxtPC7KcVZcnwhyyGGG_6s65ko4W-cHIAqHEpCTUYeBr0" alt="Volver" />
+    </a>   
+    
+    <div class="perfil">
+      <img id="fotoPerfil" src="" alt="Foto del COAR" />
+      <h2>¡Hola <span id="nombreAlumno"></span>!</h2>
+    </div>
+    <div class="grid">
+      <div class="card">
+        <h3>Información</h3>
+        <p><strong>COAR:</strong> <span id="regionAlumno"></span></p>
+        <p><strong>Promedio:</strong> <span id="promedio"><span class="loader"></span></span>/20</p>
+        <p><strong>Probabilidad de Ingreso:</strong> <span id="probabilidadIngreso">--%</span></p>
+
+      </div>
+      <div class="card">
+        <h3>Mis Evaluaciones</h3>
+        <div class="simulacro">Simulacro 01: <span id="PC1" class="bloqueado">🔒</span></div>
+        <div class="simulacro">Simulacro 02: <span id="PC2" class="bloqueado">🔒</span></div>
+        <div class="simulacro">Simulacro 03: <span id="PC3" class="bloqueado">🔒</span></div>
+        <div class="simulacro">Simulacro 04: <span id="PC4" class="bloqueado">🔒</span></div>
+        <div class="simulacro">Simulacro 05: <span id="PC5" class="bloqueado">🔒</span></div>
+        
+        
+        
+        <div class="simulacro">Simulacro 06: <span id="PC6" class="bloqueado">🔒</span></div>
+        <div class="simulacro">Simulacro 07: <span id="PC7" class="bloqueado">🔒</span></div>
+        <div class="simulacro">Simulacro 08: <span id="PC8" class="bloqueado">🔒</span></div>
+        <div class="simulacro">Simulacro 09: <span id="PC9" class="bloqueado">🔒</span></div>        
+        
+        
+        
+        <button class="revancha-btn" onclick="mostrarMenuRevancha()">Revancha</button>
+        
+      </div>
+      <div class="card">
+        <h3>Dominio de Temas</h3>
+
+        <div class="tema"><span>Porcentajes</span><div class="barra"><div class="progreso" id="prog-algebra">0%</div></div></div>
+        <div class="tema"><span>Aritmética I</span><div class="barra"><div class="progreso" id="prog-aritmetica">0%</div></div></div>
+        <div class="tema"><span>Geometría</span><div class="barra"><div class="progreso" id="prog-geometria">0%</div></div></div>
+        <div class="tema"><span>Geometría II</span><div class="barra"><div class="progreso" id="prog-estadistica">0%</div></div></div>
+        <div class="tema"><span>Mates RC</span><div class="barra"><div class="progreso" id="prog-matesrc">0%</div></div></div>
+        
+        
+        <div class="tema"><span>Mates RC 2</span><div class="barra"><div class="progreso" id="prog-trigonometria">0%</div></div></div>
+        <div class="tema"><span>Transformaciones G. + Trigo...</span><div class="barra"><div class="progreso" id="prog-probabilidades">0%</div></div></div>
+        <div class="tema"><span>Funciones</span><div class="barra"><div class="progreso" id="prog-funciones">0%</div></div></div>
+        <div class="tema"><span>Hab. Lectoras</span><div class="barra"><div class="progreso" id="prog-lectoras">0%</div></div></div>
+        
+        
+        <button id="eliminarCuentaBtn" class="btn-eliminar">Eliminar cuenta</button> 
+
+      </div>
+    </div>
+  </div>
+  <div id="transicion" style="display:none; justify-content: center; align-items: center; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.8); z-index: 9999;">
+    <div class="transicion-card" style="background: white; padding: 30px; border-radius: 15px; width: 300px; text-align: center; animation: slideUp 0.6s ease; position: relative;">
+      <button onclick="cerrarMenuRevancha()" style="position: absolute; top: 10px; right: 15px; background: transparent; border: none; font-size: 20px; font-weight: bold; cursor: pointer;">×</button>
+      <h3>¿Cuál de los exámenes deseas tener una revancha?</h3>
+      <select id="examen">
+        <option value="PC1">PC1</option>
+        <option value="PC2">PC2</option>
+        <option value="PC3">PC3</option>
+
+        <option value="PC4">PC4</option>
+        <option value="PC5">PC5</option>
+        <option value="PC6">PC6</option>
+        <option value="PC7">PC7</option>
+        <option value="PC8">PC8</option>
+        <option value="PC9">PC9</option>        
+        
+        
+        
+      </select>
+      <button class="btn-primary" onclick="enviarRevancha()">Comenzar Revancha</button>
+    </div>
+  </div>
+ 
+
+  <script>
+    document.getElementById("nombreAlumno").textContent = localStorage.getItem("nombreAlumno");
+    document.getElementById("regionAlumno").textContent = localStorage.getItem("regionAlumno");  
+
+    // Mostrar imagen según sexo
+
+    const sexo = localStorage.getItem("sexo");
+    const foto = document.getElementById("fotoPerfil");
+    
+    if (sexo === "mujer") {
+      //foto.src = "https://i.pinimg.com/736x/e3/fa/cb/e3facb5ce3cc8e7db69d9e14be81508c.jpg"; // Foto para mujeres
+      foto.src = "/static/mu1.jpg";
+ 
+    } else {
+      foto.src = "https://i.pinimg.com/736x/c6/5b/4a/c65b4aa73ee5c8c9ec8bfb641b4175b2.jpg"; // Foto para hombres
+    }
+
+
+
+
+    
+    function mostrarMenuRevancha() {
+      document.getElementById('transicion').style.display = 'flex';
+    }
+
+    function enviarRevancha() {
+      const examen = document.getElementById('examen').value;
+      const mensaje = encodeURIComponent(`¡Profesor! 🥳 Quiero dar una revancha del examen: ${examen}, por favor`);
+      const telefono = '51939476507';
+      const url = `https://api.whatsapp.com/send?phone=${telefono}&text=${mensaje}`;
+      window.open(url, '_blank');
+      document.getElementById('transicion').style.display = 'none';
+    }
+
+    function cerrarMenuRevancha() {
+      document.getElementById('transicion').style.display = 'none';
+    }
+
+    const cursos = ["PC1", "PC2", "PC3", "PC4", "PC5", "PC6", "PC7", "PC8", "PC9"];
+    const datosURL = "https://script.google.com/macros/s/AKfycbyNFssaqjICHFZz7skyiC8aeIZEUEVvdjAC1xuQmRVmVEo4rRxOI0hMiDU2e-eWxFUGPQ/exec?tipo=alumnos";
+
+    function buscarNotas() {
+      const dni = localStorage.getItem("dniAlumno");
+
+      const mapeo = {
+        PC1: 'prog-algebra',
+        
+        
+        PC2: 'prog-aritmetica',
+        PC3: 'prog-geometria',
+        PC4: 'prog-estadistica',
+        PC5: 'prog-matesrc',
+        PC6: 'prog-trigonometria',
+        PC7: 'prog-probabilidades',
+        PC8: 'prog-funciones',
+        PC9: 'prog-lectoras'
+      };      
+      
+      
+
+      cursos.forEach(curso => {
+        document.getElementById(curso).innerHTML = "<span class='loader'></span>";
+        const barra = document.getElementById(mapeo[curso]);
+        barra.style.width = '0%';
+        barra.textContent = '0%';
+        barra.style.background = '#ccc';
+      });
+
+      fetch(datosURL)
+        .then(res => res.json())
+        .then(data => {
+          const notas = data.filter(item => item.DNI == dni);
+          let suma = 0;
+          let cantidad = 0;
+
+          cursos.forEach(curso => {
+            const nota = notas.find(n => n.Curso === curso);
+            const valor = nota ? parseFloat(nota.Nota) : null;
+
+            if (valor !== null && !isNaN(valor)) {
+              document.getElementById(curso).textContent = valor;
+              suma += valor;
+              cantidad++;
+
+              const porcentaje = Math.round((valor / 20) * 100);
+              const barraID = mapeo[curso];
+              animarBarra(barraID, porcentaje);
+            } else {
+              document.getElementById(curso).textContent = "🔒";
+            }
+          });
+
+          // Mostrar el promedio
+          const promedio = cantidad > 0 ? (suma / cantidad).toFixed(2) : '--';
+          document.getElementById('promedio').textContent = promedio;
+
+          
+          
+          const probabilidad = cantidad > 0 ? (((suma - 0.84) / cantidad) / 20 * 100).toFixed(1) : '--';
+          document.getElementById('probabilidadIngreso').textContent = probabilidad + "%";
+
+
+
+
+          
+        })
+        .catch(err => {
+          cursos.forEach(curso => {
+            document.getElementById(curso).textContent = "🔒";
+          });
+          alert("Error al cargar los datos.");
+          console.error(err);
+        });
+    }
+
+
+    function obtenerGradiente(porcentaje) {
+      if (porcentaje < 50) {
+        return `linear-gradient(90deg, #f44336 ${porcentaje}%, #e0e0e0 ${porcentaje}%)`; // rojo
+      } else if (porcentaje < 75) {
+        return `linear-gradient(90deg, #ffc107 0%, #ffc107 ${porcentaje}%, #e0e0e0 ${porcentaje}%)`; // amarillo
+      } else if (porcentaje < 100) {
+        return `linear-gradient(90deg, #4caf50 0%, #4caf50 ${porcentaje}%, #e0e0e0 ${porcentaje}%)`; // verde
+      } else {
+        return `linear-gradient(135deg, #00eaff, #004aad)`; // 100% celeste a azul oscuro
+      }
+    }
+
+    
+    document.getElementById('eliminarCuentaBtn').addEventListener('click', function () {
+      const confirmar = confirm("¿Estás seguro de que deseas solicitar la eliminación de tu cuenta?");
+      if (confirmar) {
+        const mensaje = encodeURIComponent("Profesor, quiero eliminar mi cuenta");
+        const telefono = "51939476507";
+        const url = `https://api.whatsapp.com/send?phone=${telefono}&text=${mensaje}`;
+        window.open(url, '_blank');
+      }
+    });
+    
+
+
+
+
+    function animarBarra(id, porcentajeFinal) {
+      const barra = document.getElementById(id);
+      let valor = 0;
+
+      const intervalo = setInterval(() => {
+        if (valor >= porcentajeFinal) {
+          clearInterval(intervalo);
+        } else {
+          valor++;
+          barra.style.width = valor + "%";
+          barra.textContent = valor + "%";
+          barra.style.background = obtenerGradiente(valor);
+        }
+      }, 15);
+    }
+
+    window.onload = () => {
+      buscarNotas();
+    };
+  </script>
+
+
+  
+</body>
+</html>
+
+
+

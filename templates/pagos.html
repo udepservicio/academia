@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pagar con Yape - Alfa Academy</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="icon" href="/static/logo.png" type="image/png" />
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: 'Poppins', sans-serif;
+      background: url("https://img.freepik.com/vector-premium/patron-fisuras-panal-hexagonal-blanco-negro-fondo-miel-mosaico-celular_434359-116.jpg") repeat fixed;
+      background-size: auto;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 20px;
+      animation: fadeIn 1.2s ease-in-out;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .card {
+      position: relative; /* <<< AÑADE ESTA LÍNEA */
+      background-color: rgba(255, 255, 255, 1);
+      border-radius: 20px;
+      padding: 30px;
+      width: 100%;
+      max-width: 950px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 30px;
+    }
+
+    .logo-yape {
+      text-align: center;
+    }
+
+    .logo-yape img {
+      max-width: 120px;
+    }
+
+    .main-content {
+      display: flex;
+      flex-direction: column;
+      gap: 30px;
+      width: 100%;
+    }
+
+    .qr-section {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+    }
+
+    .qr img {
+      width: 200px;
+      height: 200px;
+      border-radius: 10px;
+      border: 3px solid #000;
+      margin: 20px 0;
+    }
+
+    .numero-yape {
+      font-size: 15px;
+      font-weight: 600;
+    }
+
+    form {
+      width: 100%;
+      max-width: 400px;
+      margin: 0 auto;
+    }
+
+    label {
+      display: block;
+      margin-top: 12px;
+      font-weight: 600;
+    }
+
+    input, select {
+      width: 100%;
+      margin-top: 6px;
+      padding: 10px;
+      border-radius: 10px;
+      border: 1px solid #ccc;
+      font-family: 'Poppins';
+    }
+
+    .codigo-box {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      margin-top: 6px;
+    }
+
+    .codigo-input {
+      width: 50px;
+      height: 50px;
+      text-align: center;
+      font-size: 20px;
+      border-radius: 10px;
+      border: 1px solid #ccc;
+      font-family: 'Poppins';
+    }
+
+    button {
+      margin-top: 18px;
+      width: 100%;
+      padding: 12px;
+      background: #01215c;
+      color: white;
+      font-weight: 600;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #00183f;
+    }
+
+    .nota {
+      font-size: 13px;
+      margin-top: 12px;
+      text-align: center;
+      opacity: 0.85;
+    }
+
+
+    .btn-volver {
+      position: absolute;
+      top: 16px;
+      left: 16px;
+      width: 40px;
+      height: 40px;
+      z-index: 1000;
+      border-radius: 50%;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+      background-color: white;
+      padding: 4px;
+      transition: transform 0.2s ease;
+    }
+    
+    .btn-volver img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 50%;
+    }
+    
+    .btn-volver:hover {
+      transform: scale(1.1);
+    }
+
+
+    @media (min-width: 768px) {
+      .main-content {
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .qr-section, .form-section {
+        flex: 1;
+      }
+
+      .qr-section {
+        align-items: center;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+      }
+
+      .form-section {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <a href="/" class="btn-volver" title="Volver al inicio">
+      <img src="https://play-lh.googleusercontent.com/RnyHBmPzgs7yVW7-bO_B0xjxtPC7KcVZcnwhyyGGG_6s65ko4W-cHIAqHEpCTUYeBr0" alt="Volver" />
+    </a>    
+
+    <div class="logo-yape">
+      <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTovZbCu7GgAG0OVVeqbN3hMCOVkrQ_ud1ULw&s" alt="Logo Yape">
+    </div>
+
+    <div class="main-content">
+      <div class="qr-section">
+        <h2>Paga con Yape</h2>
+        <p class="info">Escanea el siguiente código o usa el número para realizar tu pago:</p>
+        <div class="qr">
+          <img src="{{ url_for('static', filename='YAPE_QR.jpg') }}" alt="QR Yape"> 
+        </div>
+        <p class="numero-yape">
+          Número: <strong>+51 939-476-507</strong><br>
+          Titular: <strong>Christian Saavedra S.</strong>
+        </p>
+      </div>
+
+      <div class="form-section">
+        <form onsubmit="enviarComprobante(event)">
+          <label for="nombre">Nombre y Apellido del alumno:</label>
+          <input type="text" id="nombre" name="nombre" required>
+
+          <label for="genero">Género:</label>
+          <select id="genero" name="genero" required>
+            <option value="">Selecciona una opción</option>
+            <option value="Hombre">Hombre</option>
+            <option value="Mujer">Mujer</option>
+          </select>
+
+
+
+          
+          <div style="display: flex; gap: 10px; margin-top: 6px;">
+            <div style="flex: 1;">
+              <label for="dni">DNI del alumno:</label>
+              <input type="text" id="dni" name="dni" required>
+            </div>
+            <div style="flex: 1;">
+              <label for="coar">COAR:</label>
+              <select id="coar" name="coar" required>
+                <option value="">Selecciona COAR</option>
+                <option>Amazonas</option>
+                <option>Áncash</option>
+                <option>Apurímac</option>
+                <option>Arequipa</option>
+                <option>Ayacucho</option>
+                <option>Cajamarca</option>
+                <option>Callao</option>
+                <option>Cusco</option>
+                <option>Huancavelica</option>
+                <option>Huánuco</option>
+                <option>Ica</option>
+                <option>Junín</option>
+                <option>La Libertad</option>
+                <option>Lambayeque</option>
+                <option>Lima</option>
+                <option>Loreto</option>
+                <option>Madre de Dios</option>
+                <option>Moquegua</option>
+                <option>Pasco</option>
+                <option>Piura</option>
+                <option>Puno</option>
+                <option>San Martín</option>
+                <option>Tacna</option>
+                <option>Tumbes</option>
+                <option>Ucayali</option>
+              </select>
+            </div>
+          </div>          
+
+
+          <label for="comprobante">Sube la captura del pago:</label>
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <input type="file" id="comprobante" name="comprobante" accept="image/*" required onchange="mostrarVistaPrevia(this)">
+  
+ 
+            <button type="button" onclick="abrirVistaPrevia()" style="margin-top: 8px; width: 50px; height: 40px; border-radius: 18px; font-size: 14px;">
+              ️VER
+            </button>            
+            
+            
+          </div>          
+
+          <label>Código de seguridad (3 dígitos):</label>
+          <div class="codigo-box">
+            <input type="text" maxlength="1" class="codigo-input" required>
+            <input type="text" maxlength="1" class="codigo-input" required>
+            <input type="text" maxlength="1" class="codigo-input" required>
+          </div>
+
+          <button type="submit">Enviar comprobante</button>
+        </form>
+        <p class="nota">Nos comunicaremos contigo en menos de 10 minutos luego de verificar tu pago.</p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function enviarComprobante(e) {
+      e.preventDefault();
+
+      const nombre = document.getElementById("nombre").value.trim();
+      const genero = document.getElementById("genero").value;
+      const dni = document.getElementById("dni").value.trim();
+      const coar = document.getElementById("coar").value;
+      const comprobante = document.getElementById("comprobante").files[0];
+      const codigo = [...document.querySelectorAll('.codigo-input')].map(i => i.value.trim()).join('');
+
+      // Validaciones
+      if (!/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/.test(nombre)) {
+        alert("El nombre no debe contener números ni símbolos.");
+        return;
+      }
+
+      if (!/^\d{8}$/.test(dni)) {
+        alert("El DNI debe tener exactamente 8 dígitos.");
+        return;
+      }
+
+      if (!genero || !coar || !comprobante || codigo.length !== 3) {
+        alert("Por favor completa todos los campos.");
+        return;
+      }
+
+      const mensaje = `¡Profesor! 🥳 Quiero inscribirme al programa - Admisión COAR 2026 -.\nNombre: ${nombre}\nGénero: ${genero}\nDNI: ${dni}\nCOAR: ${coar}\nCódigo de seguridad: ${codigo}\nAquí reenvío mi comprobante de pago 👉🏻:`;
+      const url = `https://api.whatsapp.com/send?phone=51939476507&text=${encodeURIComponent(mensaje)}`;
+      window.open(url, '_blank');
+    }
+
+    // Avance entre campos de código
+    document.querySelectorAll('.codigo-input').forEach((input, index, inputs) => {
+      input.addEventListener('input', () => {
+        if (input.value.length === 1 && index < inputs.length - 1) {
+          inputs[index + 1].focus();
+        }
+      });
+    });
+        
+    let imagenTemporalBase64 = "";
+    
+    function mostrarVistaPrevia(input) {
+      const file = input.files[0];
+      if (!file) return;
+    
+      const reader = new FileReader();
+      reader.onload = function (e) {
+        imagenTemporalBase64 = e.target.result;
+        document.getElementById("imagenVista").src = imagenTemporalBase64;
+      };
+      reader.readAsDataURL(file);
+    }
+    
+    function abrirVistaPrevia() {
+      if (!imagenTemporalBase64) {
+        alert("Sube un Comprobante de Pago");
+        return;
+      }
+      document.getElementById("modalImagen").style.display = "flex";
+    }
+    
+    function cerrarVistaPrevia() {
+      document.getElementById("modalImagen").style.display = "none";
+    }
+    
+  </script>
+  
+  <div id="modalImagen" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background-color:rgba(0,0,0,0.7); justify-content:center; align-items:center; z-index:2000;">
+    <div style="background:white; padding:20px; border-radius:10px; max-width:90%; max-height:90%; display:flex; flex-direction:column; align-items:center;">
+      <img id="imagenVista" src="" style="max-width:100%; max-height:400px; border:2px solid #000; border-radius:10px;" alt="Comprobante">
+      <button onclick="cerrarVistaPrevia()" style="margin-top:15px; padding:8px 14px; background:#01215c; color:white; border:none; border-radius:6px; cursor:pointer;">Cerrar</button>
+    </div>
+  </div>  
+  
+</body>
+</html>

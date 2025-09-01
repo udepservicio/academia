@@ -1,0 +1,823 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Simulacro COAR | Plataforma de Evaluación</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Exo:wght@400;500;700;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --primary: #01215c;
+      --secondary: #005977;
+      --accent: #ff6b6b;
+      --light: #f0f4ff;
+      --dark: #0a1930;
+      --success: #4caf50;
+      --warning: #ff9800;
+      --card-shadow: 0 12px 30px rgba(1, 33, 92, 0.15);
+      --card-hover-shadow: 0 18px 40px rgba(1, 33, 92, 0.25);
+      --button-shadow: 0 4px 15px rgba(1, 33, 92, 0.3);
+      --button-hover-shadow: 0 6px 20px rgba(1, 33, 92, 0.4);
+      --transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    * { 
+      box-sizing: border-box; 
+      margin: 0; 
+      padding: 0; 
+    }
+
+    body {
+      font-family: 'Exo', sans-serif;
+      background: linear-gradient(135deg, #f5f7fa 0%, #e4e8f4 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 180px;
+      background: linear-gradient(45deg, var(--primary), var(--secondary));
+      z-index: -1;
+      border-radius: 0 0 40% 40%;
+      transform: scaleX(1.5);
+    }
+
+    h1, h2, h3 {
+      font-family: 'Bebas Neue', cursive;
+      color: var(--primary);
+      text-align: center;
+      letter-spacing: 1px;
+    }
+
+    h1 {
+      font-size: 2.8rem;
+      margin-bottom: 15px;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      position: relative;
+      display: inline-block;
+    }
+
+    h1::after {
+      content: "";
+      position: absolute;
+      bottom: -8px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 80px;
+      height: 4px;
+      background: var(--accent);
+      border-radius: 2px;
+    }
+
+    h2 {
+      font-size: 2.2rem;
+      margin-bottom: 20px;
+    }
+
+    h3 {
+      font-size: 1.5rem;
+      margin-bottom: 15px;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 800px;
+      padding: 20px;
+    }
+
+    .section {
+      display: none;
+      width: 100%;
+      animation-duration: 0.6s;
+      animation-fill-mode: both;
+    }
+
+    .section.active {
+      display: block;
+      animation-name: fadeInUp;
+    }
+
+    .card-container {
+      background: white;
+      border-radius: 20px;
+      box-shadow: var(--card-shadow);
+      padding: 40px 30px;
+      display: flex;
+      flex-direction: column;
+      gap: 25px;
+      position: relative;
+      overflow: hidden;
+      transform: translateY(0);
+      transition: var(--transition);
+    }
+
+    .card-container::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 8px;
+      background: linear-gradient(90deg, var(--primary), var(--secondary));
+    }
+
+    .card {
+      background: var(--light);
+      border-radius: 16px;
+      padding: 20px;
+      text-align: center;
+      font-weight: 700;
+      color: var(--primary);
+      box-shadow: 0 6px 15px rgba(0, 33, 92, 0.1);
+      transition: var(--transition);
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+      border: 2px solid transparent;
+    }
+
+    .card:hover {
+      transform: translateY(-8px);
+      box-shadow: var(--card-hover-shadow);
+      border-color: var(--primary);
+    }
+
+    .card::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 6px;
+      height: 100%;
+      background: var(--secondary);
+      transition: var(--transition);
+    }
+
+    .card:hover::before {
+      width: 100%;
+      opacity: 0.1;
+    }
+
+    .input-group {
+      position: relative;
+      margin: 20px 0;
+    }
+
+    input[type="text"] {
+      padding: 16px 20px 16px 50px;
+      width: 100%;
+      border-radius: 12px;
+      border: 2px solid #dde3ed;
+      font-size: 1.1rem;
+      font-weight: 500;
+      color: var(--dark);
+      transition: var(--transition);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    }
+
+    input[type="text"]:focus {
+      outline: none;
+      border-color: var(--secondary);
+      box-shadow: 0 0 0 4px rgba(0, 89, 119, 0.15);
+    }
+
+    .input-icon {
+      position: absolute;
+      left: 20px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--primary);
+      font-size: 1.2rem;
+    }
+
+    button {
+      background: linear-gradient(45deg, var(--primary), var(--secondary));
+      color: white;
+      padding: 16px 30px;
+      font-size: 1.1rem;
+      border: none;
+      border-radius: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: var(--transition);
+      box-shadow: var(--button-shadow);
+      letter-spacing: 0.5px;
+      width: 100%;
+      position: relative;
+      overflow: hidden;
+      z-index: 1;
+    }
+
+    button::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 0;
+      height: 100%;
+      background: linear-gradient(45deg, var(--secondary), var(--primary));
+      transition: var(--transition);
+      z-index: -1;
+    }
+
+    button:hover {
+      transform: translateY(-3px);
+      box-shadow: var(--button-hover-shadow);
+    }
+
+    button:hover::before {
+      width: 100%;
+    }
+
+    .timer-container {
+      position: relative;
+      width: 180px;
+      height: 180px;
+      margin: 0 auto 30px;
+      filter: drop-shadow(0 6px 12px rgba(0, 0, 0, 0.1));
+    }
+
+    .circle-bg {
+      stroke: #e0e7ff;
+      fill: none;
+      stroke-width: 10;
+    }
+
+    .circle {
+      stroke: var(--accent);
+      fill: none;
+      stroke-width: 10;
+      transform: rotate(-90deg);
+      transform-origin: 50% 50%;
+      stroke-dasharray: 565;
+      stroke-dashoffset: 0;
+      transition: stroke-dashoffset 1s linear;
+    }
+
+    .time-display {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      text-align: center;
+    }
+
+    .time-display h1 {
+      font-size: 2rem;
+      color: var(--primary);
+      margin: 0;
+      text-shadow: none;
+    }
+
+    .time-display h1::after {
+      display: none;
+    }
+
+    .options-container {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 15px;
+      margin-bottom: 25px;
+    }
+
+    .option-card {
+      background: white;
+      border-radius: 14px;
+      padding: 18px 15px;
+      border: 2px solid #e9edf7;
+      transition: var(--transition);
+      cursor: pointer;
+      text-align: center;
+      font-weight: 500;
+      color: var(--dark);
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+    }
+
+    .option-card:hover {
+      transform: translateY(-5px);
+      border-color: var(--secondary);
+      box-shadow: 0 8px 20px rgba(0, 89, 119, 0.15);
+    }
+
+    .option-card.selected {
+      background: var(--light);
+      border-color: var(--primary);
+      box-shadow: 0 6px 15px rgba(1, 33, 92, 0.2);
+      color: var(--primary);
+      font-weight: 700;
+    }
+
+    .option-card.selected::before {
+      content: "\f00c";
+      font-family: "Font Awesome 6 Free";
+      font-weight: 900;
+      position: absolute;
+      top: -8px;
+      right: -8px;
+      width: 28px;
+      height: 28px;
+      background: var(--success);
+      color: white;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.9rem;
+      box-shadow: 0 3px 8px rgba(76, 175, 80, 0.4);
+    }
+
+    .pregunta-text {
+      background: white;
+      border-radius: 16px;
+      padding: 25px;
+      margin-bottom: 25px;
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
+      border-left: 5px solid var(--secondary);
+    }
+
+    .progress-container {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      margin-bottom: 20px;
+    }
+
+    .progress-bar {
+      flex-grow: 1;
+      height: 12px;
+      background: #e0e7ff;
+      border-radius: 6px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--secondary), var(--primary));
+      border-radius: 6px;
+      width: 0%;
+      transition: width 0.5s ease;
+    }
+
+    .progress-text {
+      font-weight: 700;
+      color: var(--primary);
+      min-width: 60px;
+      text-align: right;
+    }
+
+    .result-container {
+      text-align: center;
+      padding: 20px 0;
+    }
+
+    .score-circle {
+      width: 200px;
+      height: 200px;
+      margin: 0 auto 25px;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: conic-gradient(var(--success) 0% var(--p), #f0f4ff var(--p) 100%);
+      border-radius: 50%;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    }
+
+    .score-circle-inner {
+      width: 160px;
+      height: 160px;
+      background: white;
+      border-radius: 50%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      box-shadow: inset 0 4px 10px rgba(0, 0, 0, 0.05);
+    }
+
+    .score-value {
+      font-size: 3rem;
+      font-weight: 900;
+      color: var(--primary);
+      line-height: 1;
+    }
+
+    .score-label {
+      font-weight: 500;
+      color: var(--dark);
+      font-size: 0.9rem;
+    }
+
+    .resumen-item {
+      background: white;
+      border-radius: 14px;
+      padding: 20px;
+      margin-bottom: 15px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+      position: relative;
+      overflow: hidden;
+      border-left: 4px solid var(--success);
+    }
+
+    .resumen-item.incorrect {
+      border-left-color: var(--accent);
+    }
+
+    .resumen-item::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, rgba(240, 244, 255, 0.6), transparent);
+      z-index: -1;
+    }
+
+    .footer {
+      text-align: center;
+      margin-top: 30px;
+      color: var(--dark);
+      font-size: 0.9rem;
+      opacity: 0.7;
+    }
+
+    /* Animaciones */
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes pulse {
+      0% {
+        transform: scale(1);
+        box-shadow: var(--card-shadow);
+      }
+      50% {
+        transform: scale(1.02);
+        box-shadow: var(--card-hover-shadow);
+      }
+      100% {
+        transform: scale(1);
+        box-shadow: var(--card-shadow);
+      }
+    }
+
+    @keyframes float {
+      0% {
+        transform: translateY(0);
+      }
+      50% {
+        transform: translateY(-10px);
+      }
+      100% {
+        transform: translateY(0);
+      }
+    }
+
+    .pulse {
+      animation: pulse 2s infinite;
+    }
+
+    .float {
+      animation: float 3s ease-in-out infinite;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .container {
+        padding: 10px;
+      }
+      
+      .card-container {
+        padding: 30px 20px;
+      }
+      
+      .options-container {
+        grid-template-columns: 1fr;
+      }
+      
+      .timer-container {
+        width: 150px;
+        height: 150px;
+      }
+      
+      .score-circle {
+        width: 170px;
+        height: 170px;
+      }
+      
+      .score-circle-inner {
+        width: 130px;
+        height: 130px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="section active" id="dni-section">
+      <div class="card-container pulse">
+        <h1>Simulacro COAR</h1>
+        <p style="text-align: center; color: #555; margin-bottom: 20px; font-weight: 500;">
+          Ingresa tu DNI para comenzar la evaluación
+        </p>
+        <div class="input-group">
+          <i class="input-icon fas fa-id-card"></i>
+          <input type="text" id="dni" placeholder="Ingresa tu número de DNI" required>
+        </div>
+        <button onclick="start()">
+          <i class="fas fa-play-circle"></i> Comenzar Evaluación
+        </button>
+        <div class="footer">
+          Plataforma de Simulación para el Examen COAR
+        </div>
+      </div>
+    </div>
+
+    <div class="section" id="tema-section">
+      <div class="card-container">
+        <h2>Elige un tema</h2>
+        <p style="text-align: center; color: #555; margin-bottom: 20px; font-weight: 500;">
+          Selecciona el área que deseas evaluar
+        </p>
+        <div class="card float" onclick="elegirTema('Porcentajes')">
+          <i class="fas fa-percentage" style="font-size: 2rem; margin-bottom: 10px;"></i><br>
+          Porcentajes
+        </div>
+        <div class="card float" style="animation-delay: 0.2s;" onclick="elegirTema('Regla de 3')">
+          <i class="fas fa-calculator" style="font-size: 2rem; margin-bottom: 10px;"></i><br>
+          Regla de 3 Simple
+        </div>
+        <div class="card float" style="animation-delay: 0.4s;" onclick="elegirTema('Ecuaciones')">
+          <i class="fas fa-superscript" style="font-size: 2rem; margin-bottom: 10px;"></i><br>
+          Planteo de Ecuaciones
+        </div>
+      </div>
+    </div>
+
+    <div class="section" id="pregunta-section">
+      <div class="card-container">
+        <div class="progress-container">
+          <div class="progress-bar">
+            <div class="progress-fill" id="progress-fill"></div>
+          </div>
+          <div class="progress-text" id="progress-text">1/3</div>
+        </div>
+        
+        <div class="timer-container">
+          <svg width="180" height="180">
+            <circle cx="90" cy="90" r="80" class="circle-bg"/>
+            <circle id="progress" cx="90" cy="90" r="80" class="circle"/>
+          </svg>
+          <div class="time-display">
+            <h1 id="time">03:00</h1>
+          </div>
+        </div>
+        
+        <div class="pregunta-text">
+          <h3 id="pregunta-text">¿Cuál es el 20% de 150?</h3>
+        </div>
+        
+        <div class="options-container" id="options-container">
+          <!-- Las opciones se generan dinámicamente -->
+        </div>
+        
+        <button onclick="siguientePregunta()">
+          <i class="fas fa-arrow-right"></i> Siguiente Pregunta
+        </button>
+      </div>
+    </div>
+
+    <div class="section" id="resultado-section">
+      <div class="card-container">
+        <h2>Resultados Finales</h2>
+        
+        <div class="result-container">
+          <div class="score-circle" id="score-circle">
+            <div class="score-circle-inner">
+              <div class="score-value" id="score-value">0%</div>
+              <div class="score-label">Puntaje</div>
+            </div>
+          </div>
+          
+          <h3>Resumen de respuestas</h3>
+          <div id="resumen"></div>
+          
+          <button onclick="showSection('dni-section')" style="margin-top: 20px; background: linear-gradient(45deg, #555, #333);">
+            <i class="fas fa-redo"></i> Realizar otro simulacro
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const preguntas = {
+      Porcentajes: [
+        { pregunta: "¿Cuál es el 20% de 150?", opciones: ["25", "30", "20", "35"], correcta: "30" },
+        { pregunta: "Un descuento de 25% sobre S/100 da:", opciones: ["S/80", "S/75", "S/70", "S/85"], correcta: "S/75" },
+        { pregunta: "Aumentar 200 en 10% resulta en:", opciones: ["210", "220", "230", "240"], correcta: "220" },
+      ],
+      'Regla de 3': [
+        { pregunta: "Si 3 cuadernos cuestan S/15, ¿cuánto cuestan 5 cuadernos?", opciones: ["S/20", "S/25", "S/30", "S/35"], correcta: "S/25" },
+        { pregunta: "Si 4 trabajadores terminan un trabajo en 6 días, ¿en cuántos días lo terminarán 2 trabajadores?", opciones: ["12 días", "10 días", "9 días", "8 días"], correcta: "12 días" },
+        { pregunta: "Si 10 litros llenan 5 botellas, ¿cuántos litros caben en cada botella?", opciones: ["3 litros", "2 litros", "4 litros", "5 litros"], correcta: "2 litros" },
+      ],
+      Ecuaciones: [
+        { pregunta: "Resuelve la ecuación: x + 5 = 12", opciones: ["x = 6", "x = 7", "x = 8", "x = 9"], correcta: "x = 7" },
+        { pregunta: "Resuelve la ecuación: 2x = 10", opciones: ["x = 4", "x = 5", "x = 6", "x = 7"], correcta: "x = 5" },
+        { pregunta: "Resuelve la ecuación: 3x - 1 = 8", opciones: ["x = 3", "x = 4", "x = 5", "x = 6"], correcta: "x = 3" },
+      ]
+    };
+
+    let dni = "", tema = "", indice = 0, puntaje = 0, tiempo = 180, intervalo, preguntasTema = [], respuestas = [], circleLength = 2 * Math.PI * 80;
+    const timeEl = document.getElementById('time');
+    const progressCircle = document.getElementById('progress');
+    progressCircle.style.strokeDasharray = circleLength;
+
+    function updateTimeDisplay() {
+      const min = String(Math.floor(tiempo / 60)).padStart(2, '0');
+      const seg = String(tiempo % 60).padStart(2, '0');
+      timeEl.textContent = `${min}:${seg}`;
+    }
+
+    function updateProgress() {
+      const offset = circleLength * (1 - tiempo / 180);
+      progressCircle.style.strokeDashoffset = offset;
+    }
+
+    function start() {
+      dni = document.getElementById("dni").value.trim();
+      if (!dni || dni.length !== 8) return alert("Por favor ingresa un DNI válido de 8 dígitos");
+      showSection("tema-section");
+    }
+
+    function elegirTema(t) {
+      tema = t;
+      preguntasTema = preguntas[t];
+      indice = 0; 
+      puntaje = 0; 
+      respuestas = [];
+      showSection("pregunta-section");
+      mostrarPregunta();
+    }
+
+    function mostrarPregunta() {
+      if (indice >= preguntasTema.length) return terminar();
+      
+      const p = preguntasTema[indice];
+      document.getElementById("pregunta-text").textContent = p.pregunta;
+      
+      // Actualizar progreso
+      document.getElementById("progress-text").textContent = `${indice+1}/${preguntasTema.length}`;
+      document.getElementById("progress-fill").style.width = `${(indice/preguntasTema.length)*100}%`;
+      
+      // Generar opciones
+      const optionsContainer = document.getElementById("options-container");
+      optionsContainer.innerHTML = "";
+      
+      p.opciones.forEach((op, i) => {
+        const optionCard = document.createElement("div");
+        optionCard.className = "option-card";
+        optionCard.textContent = op;
+        optionCard.onclick = function() {
+          // Deseleccionar todas
+          document.querySelectorAll(".option-card").forEach(card => {
+            card.classList.remove("selected");
+          });
+          // Seleccionar esta
+          this.classList.add("selected");
+        };
+        optionsContainer.appendChild(optionCard);
+      });
+      
+      // Reiniciar temporizador
+      tiempo = 180;
+      updateTimeDisplay();
+      updateProgress();
+      clearInterval(intervalo);
+      intervalo = setInterval(() => {
+        tiempo--;
+        updateTimeDisplay();
+        updateProgress();
+        if (tiempo <= 0) siguientePregunta(true);
+      }, 1000);
+    }
+
+    function siguientePregunta(auto = false) {
+      clearInterval(intervalo);
+      
+      // Obtener respuesta seleccionada
+      let respuesta = "";
+      const selected = document.querySelector(".option-card.selected");
+      if (selected) respuesta = selected.textContent;
+      
+      const correcta = preguntasTema[indice].correcta;
+      if (!auto && respuesta === correcta) puntaje++;
+      
+      respuestas.push({
+        ...preguntasTema[indice],
+        seleccionada: respuesta || "No respondió",
+        correcta: correcta
+      });
+      
+      indice++;
+      mostrarPregunta();
+    }
+
+    function terminar() {
+      clearInterval(intervalo);
+      showSection("resultado-section");
+      const porcentaje = Math.round((puntaje / preguntasTema.length) * 100);
+      
+      // Actualizar círculo de puntuación
+      const scoreCircle = document.getElementById("score-circle");
+      scoreCircle.style.setProperty('--p', `${porcentaje}%`);
+      document.getElementById("score-value").textContent = `${porcentaje}%`;
+      
+      mostrarResumen();
+      
+      // Simular envío de datos (en un entorno real, esto se enviaría al servidor)
+      console.log("Datos enviados:", {
+        dni: dni,
+        tema: tema,
+        puntaje: porcentaje
+      });
+    }
+
+    function mostrarResumen() {
+      const resumen = document.getElementById("resumen");
+      resumen.innerHTML = "";
+      
+      respuestas.forEach((r, i) => {
+        const esCorrecta = r.seleccionada === r.correcta;
+        const resumenItem = document.createElement("div");
+        resumenItem.className = `resumen-item ${esCorrecta ? '' : 'incorrect'}`;
+        
+        resumenItem.innerHTML = `
+          <div style="margin-bottom: 10px; font-weight: 700; color: var(--primary);">
+            <i class="fas fa-question-circle"></i> Pregunta ${i+1}: ${r.pregunta}
+          </div>
+          <div style="display: flex; gap: 15px; flex-wrap: wrap;">
+            <div style="flex: 1; min-width: 200px;">
+              <div style="font-weight: 600; color: #555;">Tu respuesta:</div>
+              <div style="color: ${esCorrecta ? 'var(--success)' : 'var(--accent)'}; font-weight: 700;">
+                ${r.seleccionada} ${esCorrecta ? '<i class="fas fa-check"></i>' : '<i class="fas fa-times"></i>'}
+              </div>
+            </div>
+            <div style="flex: 1; min-width: 200px;">
+              <div style="font-weight: 600; color: #555;">Respuesta correcta:</div>
+              <div style="color: var(--primary); font-weight: 700;">${r.correcta}</div>
+            </div>
+          </div>
+        `;
+        
+        resumen.appendChild(resumenItem);
+      });
+    }
+
+    function showSection(id) {
+      document.querySelectorAll(".section").forEach(sec => {
+        sec.classList.remove("active");
+      });
+      document.getElementById(id).classList.add("active");
+    }
+
+    // Escuchar teclas 1/2/3/4 para seleccionar respuesta
+    document.addEventListener("keydown", (e) => {
+      if (e.key >= '1' && e.key <= '4') {
+        const index = parseInt(e.key) - 1;
+        const options = document.querySelectorAll(".option-card");
+        if (index < options.length) {
+          // Deseleccionar todas
+          document.querySelectorAll(".option-card").forEach(card => {
+            card.classList.remove("selected");
+          });
+          // Seleccionar la opción correspondiente
+          options[index].classList.add("selected");
+        }
+      }
+    });
+  </script>
+</body>
+</html>
