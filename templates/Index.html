@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -37,7 +38,7 @@
             align-items: center;
             width: 100%;
             position: absolute;
-            top: 35%; /* Vertical a 65% del centro */
+            top: 40%; /* Vertical a 65% del centro */
             left: 50%;
             transform: translate(-50%, -35%);
         }
@@ -382,7 +383,7 @@
 
         // Manejar el envío del formulario
 
-            
+
         document.getElementById('login-form').addEventListener('submit', function(event) {
             event.preventDefault();
         
@@ -391,28 +392,42 @@
         
             if (username && password) {
         
-                const loginScreen = document.getElementById('login-screen');
-                const successScreen = document.getElementById('success-screen');
+                // 👉 Enviar DNI y palabra "SI"
+                const formData = new FormData();
+                formData.append('dni', username);
+                formData.append('valor', 'SI');
         
-                document.getElementById('fecha-asistencia').textContent = 
-                    "Tu asistencia a la clase del " + obtenerFechaHoy() + " ha sido registrada.";
+                fetch('https://script.google.com/macros/s/AKfycbzc1vNYwn6Ml-ndQVnY__HpwJWN8kelLd4bLHxGNuf7PytDrw4K485nRi1-Ei7Te5yd0Q/exec', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.text())
+                .then(data => {
+                    // Pantalla de éxito y confeti
+                    const loginScreen = document.getElementById('login-screen');
+                    const successScreen = document.getElementById('success-screen');
         
-                // Animación de salida para login
-                loginScreen.classList.add('animate-exit');
+                    document.getElementById('fecha-asistencia').textContent = 
+                        "Tu asistencia a la clase del " + obtenerFechaHoy() + " ha sido registrada.";
         
-                // Cuando termine la animación de salida, ocultamos login y mostramos éxito
-                loginScreen.addEventListener('animationend', () => {
-                    loginScreen.style.display = 'none';
-                    successScreen.style.display = 'block';
-                    successScreen.classList.add('animate-enter');
+                    loginScreen.classList.add('animate-exit');
         
-                    lanzarConfeti();
-                }, { once: true });
+                    loginScreen.addEventListener('animationend', () => {
+                        loginScreen.style.display = 'none';
+                        successScreen.style.display = 'block';
+                        successScreen.classList.add('animate-enter');
+                        lanzarConfeti();
+                    }, { once: true });
+                })
+                .catch(error => {
+                    alert('Error al registrar la asistencia: ' + error);
+                });
         
             } else {
                 alert("Por favor, complete todos los campos.");
             }
         });
+
         
         window.addEventListener('load', () => {
             document.getElementById('login-screen').classList.add('animate-enter');
