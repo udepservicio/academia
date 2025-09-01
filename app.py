@@ -14,7 +14,9 @@ def pagos():
 def examen():
     return render_template('examen.html')
 
-
+@app.route('/registro')
+def pagos():
+    return render_template('registro.html')
 
 @app.route('/panel')
 def panel():
@@ -49,3 +51,4 @@ def logout():
 
 if __name__ == '__main__':
     app.run(debug=True)
+
