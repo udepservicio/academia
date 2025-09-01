@@ -1,0 +1,7 @@
+Flask==3.1.1
+Wraps == 0.6.1
+gunicorn==23.0.0
+requests==2.32.3
+psycopg2_binary==2.9.10
+Flask-SQLAlchemy==3.0.3
+openpyxl==3.1.5
