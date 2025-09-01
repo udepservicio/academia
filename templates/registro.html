@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -492,8 +493,12 @@
 
 
 
+    
+
+
+
     <script>
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyC35cADx2EHV4PPgZpHnGEuI2YNr53H_VvdEQo5qAT6KXnQac4gENT2kKZf0bh7nGR_g/exec"; // URL de tu AppScript desplegado
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzc1vNYwn6Ml-ndQVnY__HpwJWN8kelLd4bLHxGNuf7PytDrw4K485nRi1-Ei7Te5yd0Q/exec"; // pon la URL de tu AppScript desplegado
     
     function lanzarConfeti() {
         confetti({
@@ -502,22 +507,12 @@
             origin: { y: 0.6 }
         });
         setTimeout(() => {
-            confetti({
-                particleCount: 100,
-                angle: 60,
-                spread: 80,
-                origin: { x: 0 }
-            });
-            confetti({
-                particleCount: 100,
-                angle: 120,
-                spread: 80,
-                origin: { x: 1 }
-            });
+            confetti({ particleCount: 100, angle: 60, spread: 80, origin: { x: 0 } });
+            confetti({ particleCount: 100, angle: 120, spread: 80, origin: { x: 1 } });
         }, 150);
     }
     
-    // Enviar datos del formulario
+    // Manejar envío del formulario
     document.getElementById('register-form').addEventListener('submit', async function(event) {
         event.preventDefault();
     
@@ -534,17 +529,15 @@
         }
     
         try {
-            const params = new URLSearchParams({
-                tipo: "registro",
-                nombre: nombre,
-                dni: dni,
-                celular: celular,
-                carrera: carrera,
-                modalidad: modalidad,
-                region: region
-            });
+            const formData = new FormData();
+            formData.append('nombre', nombre);
+            formData.append('dni', dni);
+            formData.append('celular', celular);
+            formData.append('carrera', carrera);
+            formData.append('modalidad', modalidad);
+            formData.append('region', region);
     
-            const response = await fetch(SCRIPT_URL + "?" + params.toString(), { method: "GET" });
+            const response = await fetch(SCRIPT_URL, { method: 'POST', body: formData });
             const result = await response.text();
     
             if (result.includes("✅")) {
@@ -565,9 +558,9 @@
         document.body.classList.add("fade-in");
     });
     </script>
+
     
 
     
 </body>
 </html>
-
