@@ -56,6 +56,22 @@
             border: 1px solid rgba(163, 177, 198, 0.3); /* Borde sutil opcional */
         }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
         .logo-section .logo {
             width: 25vw;
             height: 25vw;
@@ -131,7 +147,41 @@
             /* También eliminamos la sombra del botón */
             box-shadow: none;
             transition: all 0.3s ease;
+            
+            
+            position: relative;       /* necesario para el brillo */
+            overflow: hidden;         /* para que el brillo no se salga */          
+            
+            
         }
+
+  
+        .login-btn::before {
+          content: "";
+          position: absolute;
+          top: 0;
+          left: -75%;
+          width: 50%;
+          height: 100%;
+          background: linear-gradient(
+            120deg,
+            transparent,
+            rgba(255,255,255,0.5),
+            transparent
+          );
+          transform: skewX(-25deg);
+          animation: shine 4s infinite;
+        }
+        
+        @keyframes shine {
+          0% { left: -75%; }
+          50% { left: 125%; }   /* brillo rápido al inicio del ciclo */
+          100% { left: 125%; } /* espera hasta completar 10s */
+        }
+
+
+
+
 
         .login-btn:hover {
             /* Mantenemos solo un efecto sutil en hover */
@@ -222,6 +272,53 @@
                 padding: 40px;
             }
         }
+        
+        
+        /* Animación de entrada */
+        @keyframes cardEnter {
+            0% {
+                transform: translateY(50px) scale(0.8) rotateX(10deg);
+                opacity: 0;
+            }
+            60% {
+                transform: translateY(-10px) scale(1.05) rotateX(-5deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(0) scale(1) rotateX(0deg);
+                opacity: 1;
+            }
+        }
+        
+        /* Animación de salida */
+        @keyframes cardExit {
+            0% {
+                transform: translateY(0) scale(1) rotateX(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-30px) scale(0.7) rotateX(20deg);
+                opacity: 0;
+            }
+        }
+        
+        /* Clases para aplicar animaciones */
+        .animate-enter {
+            animation: cardEnter 0.8s ease-out forwards;
+        }
+        
+        .animate-exit {
+            animation: cardExit 0.6s ease-in forwards;
+        }        
+        
+        
+        
+        
+        
+        
+        
+        
+        
     </style>
 </head>
 <body>
@@ -246,6 +343,7 @@
                         <input type="password" id="password" placeholder="Código del día" required>
                     </div>
                     <button type="submit" class="login-btn">Registrar Asistencia</button>
+                   
                 </form>
                 <div class="links">
                     <a href="/registro">Quiero ser alumno</a>
@@ -283,24 +381,42 @@
         }
 
         // Manejar el envío del formulario
+
+            
         document.getElementById('login-form').addEventListener('submit', function(event) {
             event.preventDefault();
-
+        
             const username = document.getElementById('username').value;
             const password = document.getElementById('password').value;
-
+        
             if (username && password) {
+        
+                const loginScreen = document.getElementById('login-screen');
+                const successScreen = document.getElementById('success-screen');
+        
                 document.getElementById('fecha-asistencia').textContent = 
                     "Tu asistencia a la clase del " + obtenerFechaHoy() + " ha sido registrada.";
-                
-                document.getElementById('login-screen').style.display = 'none';
-                document.getElementById('success-screen').style.display = 'block';
-                
-                lanzarConfeti();
+        
+                // Animación de salida para login
+                loginScreen.classList.add('animate-exit');
+        
+                // Cuando termine la animación de salida, ocultamos login y mostramos éxito
+                loginScreen.addEventListener('animationend', () => {
+                    loginScreen.style.display = 'none';
+                    successScreen.style.display = 'block';
+                    successScreen.classList.add('animate-enter');
+        
+                    lanzarConfeti();
+                }, { once: true });
+        
             } else {
                 alert("Por favor, complete todos los campos.");
             }
         });
+        
+        window.addEventListener('load', () => {
+            document.getElementById('login-screen').classList.add('animate-enter');
+        });           
     </script>
 </body>
 </html>
