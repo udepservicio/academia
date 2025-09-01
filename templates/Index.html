@@ -56,22 +56,6 @@
             border: 1px solid rgba(163, 177, 198, 0.3); /* Borde sutil opcional */
         }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
         .logo-section .logo {
             width: 25vw;
             height: 25vw;
@@ -179,10 +163,6 @@
           100% { left: 125%; } /* espera hasta completar 10s */
         }
 
-
-
-
-
         .login-btn:hover {
             /* Mantenemos solo un efecto sutil en hover */
             opacity: 0.9;
@@ -205,6 +185,33 @@
 
         .links span {
             color: var(--text-secondary);
+        }
+
+        /* Estilos para la pantalla de carga */
+        #loading-screen {
+            display: none;
+            text-align: center;
+            padding: 20px 0;
+        }
+
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid rgba(30, 58, 95, 0.2);
+            border-radius: 50%;
+            border-top: 4px solid #1E3A5F;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .loading-text {
+            font-size: clamp(14px, 4vw, 16px);
+            color: var(--text-primary);
         }
 
         /* Estilos para la pantalla de éxito */
@@ -265,6 +272,12 @@
                 padding: 3% 4%;
                 font-size: 13px;
             }
+            
+            .loading-spinner {
+                width: 35px;
+                height: 35px;
+                margin-bottom: 12px;
+            }
         }
 
         @media (min-width: 1200px) {
@@ -310,15 +323,6 @@
         .animate-exit {
             animation: cardExit 0.6s ease-in forwards;
         }        
-        
-        
-        
-        
-        
-        
-        
-        
-        
     </style>
 </head>
 <body>
@@ -348,6 +352,12 @@
                 <div class="links">
                     <a href="/registro">Quiero ser alumno</a>
                 </div>
+            </div>
+
+            <!-- Pantalla de carga -->
+            <div id="loading-screen">
+                <div class="loading-spinner"></div>
+                <div class="loading-text">Registrando asistencia...</div>
             </div>
 
             <!-- Pantalla de éxito (oculta inicialmente) -->
@@ -381,8 +391,6 @@
         }
 
         // Manejar el envío del formulario
-
-
         document.getElementById('login-form').addEventListener('submit', function(event) {
             event.preventDefault();
         
@@ -390,8 +398,12 @@
             const password = document.getElementById('password').value;
         
             if (username && password) {
+                // Ocultar formulario y mostrar pantalla de carga
+                document.getElementById('login-screen').style.display = 'none';
+                document.getElementById('loading-screen').style.display = 'block';
+                document.getElementById('success-screen').style.display = 'none';
         
-                // 👉 Enviar DNI y palabra "SI"
+                // Enviar DNI y palabra "SI"
                 const formData = new FormData();
                 formData.append('dni', username);
                 formData.append('valor', 'SI');
@@ -402,23 +414,20 @@
                 })
                 .then(response => response.text())
                 .then(data => {
-                    // Pantalla de éxito y confeti
-                    const loginScreen = document.getElementById('login-screen');
-                    const successScreen = document.getElementById('success-screen');
-        
+                    // Ocultar pantalla de carga
+                    document.getElementById('loading-screen').style.display = 'none';
+                    
+                    // Mostrar pantalla de éxito y confeti
                     document.getElementById('fecha-asistencia').textContent = 
                         "Tu asistencia a la clase del " + obtenerFechaHoy() + " ha sido registrada.";
-        
-                    loginScreen.classList.add('animate-exit');
-        
-                    loginScreen.addEventListener('animationend', () => {
-                        loginScreen.style.display = 'none';
-                        successScreen.style.display = 'block';
-                        successScreen.classList.add('animate-enter');
-                        lanzarConfeti();
-                    }, { once: true });
+                    
+                    document.getElementById('success-screen').style.display = 'block';
+                    lanzarConfeti();
                 })
                 .catch(error => {
+                    // En caso de error, volver al formulario
+                    document.getElementById('loading-screen').style.display = 'none';
+                    document.getElementById('login-screen').style.display = 'block';
                     alert('Error al registrar la asistencia: ' + error);
                 });
         
