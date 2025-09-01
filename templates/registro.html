@@ -490,71 +490,84 @@
         </div>
     </div>
 
+
+
     <script>
-        function lanzarConfeti() {
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyC35cADx2EHV4PPgZpHnGEuI2YNr53H_VvdEQo5qAT6KXnQac4gENT2kKZf0bh7nGR_g/exec"; // URL de tu AppScript desplegado
+    
+    function lanzarConfeti() {
+        confetti({
+            particleCount: 150,
+            spread: 100,
+            origin: { y: 0.6 }
+        });
+        setTimeout(() => {
             confetti({
-                particleCount: 150,
-                spread: 100,
-                origin: { y: 0.6 }
+                particleCount: 100,
+                angle: 60,
+                spread: 80,
+                origin: { x: 0 }
             });
-            setTimeout(() => {
-                confetti({
-                    particleCount: 100,
-                    angle: 60,
-                    spread: 80,
-                    origin: { x: 0 }
-                });
-                confetti({
-                    particleCount: 100,
-                    angle: 120,
-                    spread: 80,
-                    origin: { x: 1 }
-                });
-            }, 150);
+            confetti({
+                particleCount: 100,
+                angle: 120,
+                spread: 80,
+                origin: { x: 1 }
+            });
+        }, 150);
+    }
+    
+    // Enviar datos del formulario
+    document.getElementById('register-form').addEventListener('submit', async function(event) {
+        event.preventDefault();
+    
+        const nombre = document.getElementById('nombre').value.trim();
+        const dni = document.getElementById('dni').value.trim();
+        const celular = document.getElementById('celular').value.trim();
+        const carrera = document.getElementById('carrera').value;
+        const modalidad = document.getElementById('modalidad').value;
+        const region = document.getElementById('region').value;
+    
+        if (!nombre || !dni || !celular || !carrera || !modalidad || !region) {
+            alert("Por favor, complete todos los campos.");
+            return;
         }
     
-        // ✅ Evento de envío del formulario
-        document.getElementById('register-form').addEventListener('submit', function(event) {
-            event.preventDefault();
-            const nombre = document.getElementById('nombre').value;
-            const dni = document.getElementById('dni').value;
-            const celular = document.getElementById('celular').value;
-            const carrera = document.getElementById('carrera').value;
-            const modalidad = document.getElementById('modalidad').value;
-            const region = document.getElementById('region').value;
+        try {
+            const params = new URLSearchParams({
+                tipo: "registro",
+                nombre: nombre,
+                dni: dni,
+                celular: celular,
+                carrera: carrera,
+                modalidad: modalidad,
+                region: region
+            });
     
-            if (nombre && dni && celular && carrera && modalidad && region) {
+            const response = await fetch(SCRIPT_URL + "?" + params.toString(), { method: "GET" });
+            const result = await response.text();
+    
+            if (result.includes("✅")) {
                 document.getElementById('success-name').textContent = `¡Felicidades ${nombre}!`;
                 document.getElementById('register-screen').style.display = 'none';
                 document.getElementById('success-screen').style.display = 'block';
                 lanzarConfeti();
             } else {
-                alert("Por favor, complete todos los campos.");
+                alert("❌ Error al registrar: " + result);
             }
-        });
+        } catch (error) {
+            alert("❌ Error en la conexión: " + error.message);
+        }
+    });
     
-        // ✅ Fade In al cargar
-        window.addEventListener("load", () => {
-            document.body.classList.add("fade-in");
-        });
-    
-        // ✅ Fade Out al salir
-        document.querySelectorAll("a").forEach(el => {
-            el.addEventListener("click", function(e) {
-                const href = this.getAttribute("href");
-                if (href && href.startsWith("/")) { // Solo aplica a enlaces internos
-                    e.preventDefault();
-                    document.body.classList.remove("fade-in");
-                    document.body.classList.add("fade-out");
-                    setTimeout(() => {
-                        window.location.href = href;
-                    }, 500); // mismo tiempo que el CSS
-                }
-            });
-        });
+    // Fade in al cargar
+    window.addEventListener("load", () => {
+        document.body.classList.add("fade-in");
+    });
     </script>
     
 
     
 </body>
 </html>
+
