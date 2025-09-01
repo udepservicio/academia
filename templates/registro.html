@@ -1,0 +1,461 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Registro Academia BECA 18</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
+    <style>
+        :root {
+            --base-color: #f2f4f8;
+            --card-color: #ffffff;
+            --shadow-dark: rgba(0,0,0,0.15);
+            --shadow-light: rgba(255,255,255,0.9);
+            --text-primary: #333;
+            --text-secondary: #777;
+            --accent: #007bff;
+            --success: #28a745;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--base-color);
+            font-family: 'Poppins', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+            line-height: 1.6;
+        }
+
+        .container {
+            display: flex;
+            justify-content: center;
+            align-items: stretch;
+            width: 100%;
+            max-width: 1000px;
+            border-radius: 30px;
+            box-shadow: 10px 10px 25px var(--shadow-dark), -5px -5px 15px var(--shadow-light);
+            overflow: hidden;
+            background: var(--card-color);
+        }
+
+        .info-panel {
+            flex: 1;
+            background: linear-gradient(145deg, var(--accent), #0056b3);
+            color: white;
+            padding: 40px;
+            display: none; /* Oculto en móviles */
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .info-panel h2 {
+            font-size: 28px;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+
+        .info-panel p {
+            margin-bottom: 15px;
+            font-size: 16px;
+        }
+
+        .benefits-list {
+            margin: 20px 0;
+            padding-left: 20px;
+        }
+
+        .benefits-list li {
+            margin-bottom: 10px;
+        }
+
+        .info-image {
+            margin-top: 30px;
+            text-align: center;
+            font-size: 5rem;
+            opacity: 0.8;
+        }
+
+        .card {
+            background-color: var(--card-color);
+            padding: 40px;
+            text-align: center;
+            width: 100%;
+            position: relative;
+            z-index: 1;
+        }
+
+        .logo-section {
+            margin-bottom: 25px;
+        }
+
+        .logo-section .logo {
+            width: 90px;
+            height: 90px;
+            margin: 0 auto 15px;
+            border-radius: 50%;
+            box-shadow: 6px 6px 15px var(--shadow-dark);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        .logo img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .logo-section h2 {
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 5px;
+            font-size: 22px;
+        }
+
+        .logo-section p {
+            color: var(--text-secondary);
+            margin-top: 0;
+            font-size: 14px;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .form-group {
+            flex: 1;
+        }
+
+        .input-group {
+            display: flex;
+            align-items: center;
+            background-color: var(--card-color);
+            border-radius: 18px;
+            padding: 12px 20px;
+            border: 1px solid #ddd;
+            height: 100%;
+        }
+
+        .input-group i {
+            color: var(--text-secondary);
+            margin-right: 10px;
+            min-width: 20px;
+            font-size: 16px;
+        }
+
+        .input-group input, .input-group select {
+            border: none;
+            background: none;
+            outline: none;
+            width: 100%;
+            font-size: 15px;
+            color: var(--text-primary);
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .input-group select {
+            appearance: none;
+        }
+
+        .register-btn {
+            background: linear-gradient(145deg, #007bff, #0056b3);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 20px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            box-shadow: 5px 5px 15px var(--shadow-dark);
+            transition: all 0.3s ease;
+            margin-top: 20px;
+        }
+
+        .register-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        /* Pantalla de éxito */
+        #success-screen {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .success-icon {
+            font-size: 60px;
+            color: var(--success);
+            margin-bottom: 20px;
+        }
+
+        .success-message {
+            font-size: 22px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 15px;
+        }
+
+        .success-info {
+            font-size: 16px;
+            color: var(--text-primary);
+            margin-bottom: 25px;
+            line-height: 1.5;
+        }
+
+        .whatsapp-btn {
+            display: inline-block;
+            background: linear-gradient(145deg, #25D366, #128C7E);
+            color: white;
+            text-decoration: none;
+            padding: 12px 25px;
+            border-radius: 20px;
+            font-size: 16px;
+            font-weight: 600;
+            margin-top: 15px;
+            transition: all 0.3s ease;
+        }
+
+        .whatsapp-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .back-btn {
+            background: linear-gradient(145deg, #6c757d, #495057);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 20px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: all 0.3s ease;
+        }
+
+        /* Responsive */
+        @media (min-width: 768px) {
+            .info-panel {
+                display: flex;
+            }
+            .container {
+                flex-direction: row;
+            }
+            .card {
+                flex: 1.2;
+                padding: 40px;
+            }
+        }
+
+        @media (max-width: 767px) {
+            .container {
+                flex-direction: column;
+                border-radius: 15px;
+                box-shadow: none;
+            }
+            .card {
+                padding: 20px 15px;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+                border-radius: 12px;
+            }
+            .form-row {
+                flex-direction: column;
+                gap: 12px;
+                margin-bottom: 12px;
+            }
+            .input-group {
+                padding: 10px 14px;
+                border-radius: 10px;
+            }
+            .register-btn {
+                border-radius: 10px;
+                padding: 12px;
+                font-size: 15px;
+            }
+            .logo-section h2 {
+                font-size: 18px;
+            }
+            .logo-section p {
+                font-size: 13px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Panel informativo -->
+        <div class="info-panel">
+            <div>
+                <h2>¡Bienvenido a la Academia BECA 18!</h2>
+                <p>Estás a un paso de formar parte de nuestro programa de preparación para el examen de admisión 2026-I.</p>
+                <ul class="benefits-list">
+                    <li><i class="fas fa-check-circle"></i> Clases dirigidas por profesionales especializados</li>
+                    <li><i class="fas fa-check-circle"></i> Material de estudio actualizado</li>
+                    <li><i class="fas fa-check-circle"></i> Simulacros de examen periódicos</li>
+                    <li><i class="fas fa-check-circle"></i> Asesoría personalizada</li>
+                </ul>
+                <p>Completa el formulario para iniciar tu proceso de inscripción.</p>
+            </div>
+            <div class="info-image">
+                <i class="fas fa-graduation-cap"></i>
+            </div>
+        </div>
+
+        <!-- Panel de formulario -->
+        <div class="card">
+            <div id="register-screen">
+                <div class="logo-section">
+                    <div class="logo">
+                        <img src="https://media.licdn.com/dms/image/v2/D560BAQFYsd8BKLrP8w/company-logo_200_200/B56ZeDavxHHEAI-/0/1750256516692/udep_conecta_logo?e=2147483647&v=beta&t=yTmBPQe_8GFM_fd-JwbMNPhv8nVTci2CP6VBN04J0BA" alt="Logo Academia">
+                    </div>
+                    <h2>ACADEMIA BECA 18</h2>
+                    <p>Registro de Aspirantes 2026-I</p>
+                </div>
+
+                <form id="register-form">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <div class="input-group">
+                                <i class="fas fa-user"></i>
+                                <input type="text" id="nombre" placeholder="Nombre Completo" required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <div class="input-group">
+                                <i class="fas fa-id-card"></i>
+                                <input type="number" id="dni" placeholder="DNI" required>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="input-group">
+                                <i class="fas fa-phone"></i>
+                                <input type="tel" id="celular" placeholder="Celular" required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <div class="input-group">
+                                <i class="fas fa-graduation-cap"></i>
+                                <select id="carrera" required>
+                                    <option value="" disabled selected>Selecciona carrera</option>
+                                    <option value="Arquitectura">Arquitectura</option>
+                                    <option value="Ingeniería Civil">Ingeniería Civil</option>
+                                    <option value="Ingeniería Industrial">Ingeniería Industrial</option>
+                                    <option value="Ingeniería Mecánico-Eléctrica">Ingeniería Mecánico-Eléctrica</option>
+                                    <option value="Ingeniería de Software">Ingeniería de Software</option>
+                                    <option value="Administración">Administración</option>
+                                    <option value="Contabilidad">Contabilidad</option>
+                                    <option value="Economía">Economía</option>
+                                    <option value="Derecho">Derecho</option>
+                                    <option value="Psicología">Psicología</option>
+                                    <option value="Medicina">Medicina</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <div class="input-group">
+                                <i class="fas fa-laptop-house"></i>
+                                <select id="modalidad" required>
+                                    <option value="" disabled selected>Modalidad</option>
+                                    <option value="Presencial">Presencial</option>
+                                    <option value="Virtual">Virtual</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="input-group">
+                                <i class="fas fa-map-marker-alt"></i>
+                                <input type="text" id="region" placeholder="Región" required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="register-btn">Registrarse</button>
+                </form>
+            </div>
+
+            <!-- Pantalla de éxito -->
+            <div id="success-screen">
+                <div class="success-icon">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <div class="success-message" id="success-name">¡Felicidades!</div>
+                <div class="success-info">
+                    Te has registrado con éxito a la Academia BECA 18.<br>
+                    Únete al siguiente grupo de WhatsApp para mayor información:
+                </div>
+                <a href="https://chat.whatsapp.com/ENiZgEjutXI1rjQqfKsJvq" class="whatsapp-btn" target="_blank">
+                    <i class="fab fa-whatsapp"></i> Unirse al grupo
+                </a>
+                <br>
+                <button class="back-btn" onclick="window.location.reload()">Volver</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function lanzarConfeti() {
+            confetti({
+                particleCount: 150,
+                spread: 100,
+                origin: { y: 0.6 }
+            });
+            setTimeout(() => {
+                confetti({
+                    particleCount: 100,
+                    angle: 60,
+                    spread: 80,
+                    origin: { x: 0 }
+                });
+                confetti({
+                    particleCount: 100,
+                    angle: 120,
+                    spread: 80,
+                    origin: { x: 1 }
+                });
+            }, 150);
+        }
+
+        document.getElementById('register-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const nombre = document.getElementById('nombre').value;
+            const dni = document.getElementById('dni').value;
+            const celular = document.getElementById('celular').value;
+            const carrera = document.getElementById('carrera').value;
+            const modalidad = document.getElementById('modalidad').value;
+            const region = document.getElementById('region').value;
+
+            if (nombre && dni && celular && carrera && modalidad && region) {
+                document.getElementById('success-name').textContent = `¡Felicidades ${nombre}!`;
+                document.getElementById('register-screen').style.display = 'none';
+                document.getElementById('success-screen').style.display = 'block';
+                lanzarConfeti();
+            } else {
+                alert("Por favor, complete todos los campos.");
+            }
+        });
+    </script>
+</body>
+</html>
