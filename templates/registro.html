@@ -36,8 +36,16 @@
             min-height: 100vh;
             padding: 20px;
             line-height: 1.6;
+
+            
+            opacity: 0;
+            transition: opacity 0.8s ease-in-out;
+            
         }
 
+        body.fade-in {
+            opacity: 1;
+        }        
         .container {
             display: flex;
             justify-content: center;
@@ -476,7 +484,8 @@
                 });
             }, 150);
         }
-
+    
+        // ✅ Evento de envío del formulario
         document.getElementById('register-form').addEventListener('submit', function(event) {
             event.preventDefault();
             const nombre = document.getElementById('nombre').value;
@@ -485,7 +494,7 @@
             const carrera = document.getElementById('carrera').value;
             const modalidad = document.getElementById('modalidad').value;
             const region = document.getElementById('region').value;
-
+    
             if (nombre && dni && celular && carrera && modalidad && region) {
                 document.getElementById('success-name').textContent = `¡Felicidades ${nombre}!`;
                 document.getElementById('register-screen').style.display = 'none';
@@ -495,6 +504,30 @@
                 alert("Por favor, complete todos los campos.");
             }
         });
+    
+        // ✅ Fade In al cargar
+        window.addEventListener("load", () => {
+            document.body.classList.add("fade-in");
+        });
+    
+        // ✅ Fade Out al salir
+        document.querySelectorAll("a").forEach(el => {
+            el.addEventListener("click", function(e) {
+                const href = this.getAttribute("href");
+                if (href && href.startsWith("/")) { // Solo aplica a enlaces internos
+                    e.preventDefault();
+                    document.body.classList.remove("fade-in");
+                    document.body.classList.add("fade-out");
+                    setTimeout(() => {
+                        window.location.href = href;
+                    }, 500); // mismo tiempo que el CSS
+                }
+            });
+        });
     </script>
+    
+
+    
 </body>
 </html>
+
