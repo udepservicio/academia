@@ -1,446 +1,260 @@
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Inicio COAR</title>
-  <link rel="icon" href="/static/logo.png" type="image/png" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Neumorphism Login</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
+    <style>
+        body {
+            background-color: #e0e5ec;
+            font-family: 'Poppins', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
 
-  <!-- Fuentes externas -->
-  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap" rel="stylesheet" />
-  <link href="https://fonts.googleapis.com/css2?family=Exo:wght@900&display=swap" rel="stylesheet" />
-  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+        .container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transform: translateY(-4%);
+        }
 
-  <style>
-    * {
-      box-sizing: border-box;
-    }
+        .card {
+            background-color: #e0e5ec;
+            padding: 40px;
+            border-radius: 40px;
+            box-shadow: 10px 10px 20px #a3b1c6, -10px -10px 20px #ffffff;
+            text-align: center;
+            max-width: 250px;
+            width: 100%;
+            position: relative;
+            z-index: 1;
+        }
 
-    body {
-      margin: 0;
-      padding: 0;
-      font-family: 'Arial', sans-serif;
-      background-image: url("https://img.freepik.com/vector-premium/patron-fisuras-panal-hexagonal-blanco-negro-fondo-miel-mosaico-celular_434359-116.jpg?semt=ais_hybrid&w=740");
-      background-size: auto;
-      background-repeat: repeat;
-      background-position: top left;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      min-height: 100vh;
-      background-color: #e2cece;
-      position: relative;
-      overflow-x: hidden;   /* ✅ evita scroll lateral */
-      animation: bodyFadeIn 0.6s ease;
-      opacity: 1 !important;
-    }
+        .logo-section .logo {
+            width: 100px;
+            height: 100px;
+            margin: 0 auto 20px;
+            border-radius: 50%;
+            box-shadow: 8px 8px 16px #a3b1c6, -8px -8px 16px #ffffff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
 
-    @keyframes bodyFadeIn {
-      from { opacity: 0; }
-      to { opacity: 1; }
-    }
+        .logo img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
 
-    @keyframes bodyFadeOut {
-      from { opacity: 1; }
-      to { opacity: 0; }
-    }
+        .logo-section h2 {
+            font-weight: 600;
+            color: #4a5464;
+            margin-bottom: 5px;
+        }
 
-    .fade-out {
-      animation: bodyFadeOut 0.5s ease forwards;
-    }
+        .logo-section p {
+            color: #8c9cb6;
+            margin-top: 0;
+            font-size: 14px;
+        }
 
-    .container {
-      padding: 30px 20px;
-      width: 100%;
-      max-width: 400px;
-      text-align: center;
-      animation: contentFadeIn 0.8s ease;
-    }
+        .input-group {
+            display: flex;
+            align-items: center;
+            background-color: #e0e5ec;
+            border-radius: 20px;
+            padding: 10px 20px;
+            margin: 20px 0;
+            box-shadow: inset 5px 5px 10px #a3b1c6, inset -5px -5px 10px #ffffff;
+        }
 
-    @keyframes contentFadeIn {
-      from { opacity: 0; transform: translateY(20px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
+        .input-group i {
+            color: #8c9cb6;
+            margin-right: 10px;
+        }
 
-    .avatar {
-      width: 140px;
-      height: 140px;
-      border-radius: 50%;
-      object-fit: cover;
-      margin: 0 auto 4px auto;
-      border: 4px solid #00000033;
-      box-shadow: 0 6px 8px #00000055;
-      /* margin-top: 19px;  */
-    }
+        .input-group input {
+            border: none;
+            background: none;
+            outline: none;
+            width: 100%;
+            font-size: 16px;
+            color: #4a5464;
+        }
 
-    h1 {
-      margin: 5px 0 5px;
-      font-size: 28px;
-      color: #2a1f4a;
-      margin-bottom: 4px;
-      margin-top: 4px;
-      font-family: 'Bebas Neue', cursive;
-    }
+        .login-btn {
+            background: linear-gradient(145deg, #007bff, #0056b3);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 25px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            box-shadow: 5px 5px 10px #a3b1c6, -5px -5px 10px #ffffff;
+            transition: all 0.3s ease;
+        }
 
-    p {
-      margin: 0 0 30px;
-      font-size: 18px;
-      color: #000;
-      font-family: 'Exo', sans-serif;
-    }
+        .login-btn:hover {
+            box-shadow: 2px 2px 5px #a3b1c6, -2px -2px 5px #ffffff;
+        }
 
-    .button {
-      display: block;
-      width: 100%;
-      max-width: 250px;
-      padding: 14px;
-      margin: 12px auto;
-      border: none;
-      border-radius: 20px;
-      font-size: 16px;
-      font-weight: bold;
-      color: white;
-      box-shadow: 4px 4px 0px #000;
-      cursor: pointer;
-      transition: transform 0.15s ease, box-shadow 0.15s ease, background-color 0.3s ease, filter 0.3s ease;
-      font-family: 'Exo', sans-serif;
-    }
+        .links {
+            margin-top: 25px;
+            font-size: 14px;
+        }
 
-    .button:hover {
-      transform: translateY(-2px);
-      box-shadow: 6px 6px 0px #000;
-      filter: brightness(1.05);
-    }
+        .links a {
+            color: #007bff;
+            text-decoration: none;
+            margin: 0 5px;
+        }
 
-    .button:active {
-      transform: translate(2px, 2px);
-      box-shadow: 2px 2px 0px #000;
-      filter: brightness(0.95);
-    }
+        .links a:hover {
+            text-decoration: underline;
+        }
 
-    .btn-purple {
-      background-color: #01215c;
-    }
+        .links span {
+            color: #8c9cb6;
+        }
 
-    .btn-green {
-      background-color: #02592a;
-    }
+        /* Estilos para la pantalla de éxito */
+        #success-screen {
+            display: none;
+            text-align: center;
+        }
 
-    .counter {
-      position: absolute;
-      top: 12px;
-      left: 12px;
-      opacity: 1;
-      background-color: #363636;
-      color: white;
-      font-size: 12px;
-      font-weight: bold;
-      padding: 6px 10px 6px 28px;
-      border-radius: 12px;
-      box-shadow: 2px 2px 4px #00000066;
-      z-index: 100;
-      user-select: none;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      font-family: 'Exo', sans-serif;
-    }
+        .success-icon {
+            font-size: 60px;
+            color: #28a745;
+            margin-bottom: 20px;
+        }
 
-    .dot {
-      width: 10px;
-      height: 10px;
-      background-color: red;
-      border-radius: 50%;
-      position: absolute;
-      left: 10px;
-      animation: pulse 1.2s infinite;
-    }
+        .success-message {
+            font-size: 22px;
+            font-weight: 600;
+            color: #4a5464;
+            margin-bottom: 15px;
+        }
 
-    @keyframes pulse {
-      0% { transform: scale(1); opacity: 1; }
-      50% { transform: scale(1.3); opacity: 0.5; }
-      100% { transform: scale(1); opacity: 1; }
-    }
+        .success-date {
+            font-size: 18px;
+            color: #8c9cb6;
+            margin-bottom: 30px;
+        }
 
-    .footer {
-      margin-top: 20px;
-      font-size: 16px;
-      color: #4a1f46;
-      font-weight: bold;
-      font-family: 'Exo', sans-serif;
-    }
+        .back-btn {
+            background: linear-gradient(145deg, #6c757d, #495057);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 25px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 5px 5px 10px #a3b1c6, -5px -5px 10px #ffffff;
+            transition: all 0.3s ease;
+        }
 
-    .modal {
-      display: none;
-      position: fixed;
-      z-index: 999;
-      left: 0;
-      top: 0;
-      width: 100%;
-      height: 100%;
-      background-color: rgba(0,0,0,0.6);
-      justify-content: center;
-      align-items: center;
-    }
-
-    .modal-content {
-      background-color: white;
-      padding: 20px;
-      border-radius: 10px;
-      max-width: 90%;
-      max-height: 90%;
-      box-shadow: 0 0 10px rgba(0,0,0,0.3);
-      transform: scale(0.8);
-      opacity: 0;
-      animation: scaleIn 0.3s ease forwards;
-    }
-
-    .modal-content img {
-      max-width: 100%;
-      max-height: 80vh;
-      display: block;
-    }
-
-    .flecha {
-      position: absolute;
-      top: 50%;
-      font-size: 36px;
-      color: #333;
-      background-color: rgba(255, 255, 255, 0.6);
-      padding: 8px 12px;
-      cursor: pointer;
-      user-select: none;
-      transform: translateY(-50%);
-      border-radius: 6px;
-      z-index: 1;
-      transition: background-color 0.3s ease;
-    }
-    
-    .flecha:hover {
-      background-color: rgba(255, 255, 255, 0.9);
-    }
-    
-    .flecha.izquierda {
-      left: 10px;
-    }
-    
-    .flecha.derecha {
-      right: 10px;
-    }
-    
-    #imagenTemario {
-      max-width: 100%;
-      max-height: 80vh;
-      display: block;
-      margin: 0 auto;
-      border-radius: 10px;
-    }
-
-
-
-    
-    .close {
-      color: #aaa;
-      font-size: 28px;
-      font-weight: bold;
-      position: absolute;
-      top: 20px;
-      right: 40px;
-      cursor: pointer;
-      transition: color 0.3s ease;
-    }
-
-    .close:hover {
-      color: #333;
-    }
-
-    @keyframes scaleIn {
-      from { transform: scale(0.8); opacity: 0; }
-      to { transform: scale(1); opacity: 1; }
-    }
-
-    @keyframes scaleOut {
-      from { transform: scale(1); opacity: 1; }
-      to { transform: scale(0.8); opacity: 0; }
-    }
-
-    .animarSalida {
-      animation: fadeOut 0.3s ease forwards;
-    }
-
-    .animarContenidoSalida {
-      animation: scaleOut 0.3s ease forwards;
-    }
-
-    .inscribirme-btn:hover {
-      animation: bounce 0.4s ease;
-    }
-
-    @keyframes bounce {
-      0% { transform: scale(1); }
-      50% { transform: scale(1.08); }
-      100% { transform: scale(1); }
-    }
-  </style>
+        .back-btn:hover {
+            box-shadow: 2px 2px 5px #a3b1c6, -2px -2px 5px #ffffff;
+        }
+    </style>
 </head>
 <body>
-  <div class="counter">
-    <div class="dot"></div>
-    <span id="contadorTexto">--- personas activas</span>
-  </div>
+    <div class="container">
+        <div class="card">
+            <!-- Formulario de login (visible inicialmente) -->
+            <div id="login-screen">
+                <div class="logo-section">
+                    <div class="logo">
+                        <img src="https://media.licdn.com/dms/image/v2/D560BAQFYsd8BKLrP8w/company-logo_200_200/B56ZeDavxHHEAI-/0/1750256516692/udep_conecta_logo?e=2147483647&v=beta&t=yTmBPQe_8GFM_fd-JwbMNPhv8nVTci2CP6VBN04J0BA" alt="Web Dev Logo">
+                    </div>
+                    <h2>ACADEMIA BECA 18</h2>
+                    <p>Admisión 2026-I</p>
+                </div>
+                <form id="login-form">
+                    <div class="input-group">
+                        <i class="fas fa-user"></i>
+                        <input type="text" id="username" placeholder="DNI" required>
+                    </div>
+                    <div class="input-group">
+                        <i class="fas fa-lock"></i>
+                        <input type="password" id="password" placeholder="Código del día" required>
+                    </div>
+                    <button type="submit" class="login-btn">Registrar Asistencia</button>
+                </form>
+                <div class="links">
+                    <a href="#">Quiero ser alumno</a>
+                </div>
+            </div>
 
-  <div class="container">
-    <img src="https://i.pinimg.com/736x/7d/bb/4a/7dbb4ad8b5fcd7fa3451ae9d02facf18.jpg" alt="Logo" class="avatar">
-    <h1>¡Bienvenid@!</h1>
-
-    <button class="button btn-purple" onclick="redirigirConSalida('estadisticas')">MIS ESTADÍSTICAS</button>
-    <button class="button btn-purple" onclick="redirigirConSalida('curso')"> PREPARACIÓN COAR 2026</button>
-    <button class="button btn-purple" onclick="mostrarModal()">TEMARIO COAR 2026</button>
-    <button class="button btn-green" onclick="redirigirConSalida('whatsapp')">WHATSAPP</button>
-    <button class="inscribirme-btn" style="background-color: #770268; color: white; font-size: 12px; padding: 6px 12px; border: none; border-radius: 10px; cursor: pointer; font-family: 'Exo', sans-serif;" onclick="confetiYRedirigir()">
-      Inscribirme
-    </button>
-
-    <div class="footer">@Alfa Academy</div>
-  </div>
-
-  <div id="miModal" class="modal">
-    <span class="close" onclick="cerrarModal()">&times;</span>
-    
-
-    <div class="modal-content" id="modalContent">
-      <span class="flecha izquierda" onclick="cambiarImagen(-1)">&#10094;</span>
-      <img id="imagenTemario" src="/static/mat.png" alt="Temario">
-      <span class="flecha derecha" onclick="cambiarImagen(1)">&#10095;</span>
+            <!-- Pantalla de éxito (oculta inicialmente) -->
+            <div id="success-screen">
+                <div class="success-icon">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <div class="success-message">¡Felicidades Milagros Mendoza!</div>
+                <div class="success-date" id="fecha-asistencia"></div>
+                <button class="back-btn" onclick="window.location.reload()">Volver</button>
+            </div>
+        </div>
     </div>
-    
-  </div>
 
+    <script>
+        // Función para formatear la fecha en español
+        function obtenerFechaHoy() {
+            const fecha = new Date();
+            const opciones = { weekday: 'long', day: 'numeric', month: 'long' };
+            const fechaFormateada = fecha.toLocaleDateString('es-ES', opciones);
+            
+            // Capitalizar la primera letra del día y mes
+            return fechaFormateada.replace(/^\w/, c => c.toUpperCase());
+        }
 
-  <script>
-    function redirigirConSalida(seccion) {
-      document.body.classList.add('fade-out');
-      setTimeout(() => goTo(seccion), 500);
-    }
-  
-    
-    function goTo(section) {
-      switch (section) {
-        case 'estadisticas':
-          const acceso = localStorage.getItem("acceso_concedido");
-          if (acceso === "si") {
-            window.location.href = "/panel"; // ✅ acceso directo
-          } else {
-            window.location.href = "/transicion"; // 🔒 requiere login
-          }
-          break;
-        case 'curso':
-          window.location.href = "/repositorio_examenes";
-          break;
-        case 'whatsapp':
-          window.location.href = "https://api.whatsapp.com/send?phone=51939476507&text=información%20sobre%20el%20COAR";
-          break;
-        case 'pagos':
-          window.location.href = "/pagos";
-          break;
-      }
-    }     
-  
-    function confetiYRedirigir() {
-      confetti({ particleCount: 120, spread: 90, origin: { y: 0.6 } });
-      document.body.classList.add('fade-out');
-      setTimeout(() => goTo('pagos'), 700);
-    }
-  
-    // 🧠 Lógica inteligente para definir el rango según la hora del día
-    function obtenerRangoHora() {
-      const hora = new Date().getHours();
-      if (hora >= 23 || hora < 8) return [3, 40];
-      if (hora >= 8 && hora < 12) return [41, 100];
-      if (hora >= 12 && hora < 17) return [85, 210];
-      return [150, 300];
-    }
-  
-    // Inicializa el contador en un valor aleatorio dentro del rango actual
-    let [minPersonas, maxPersonas] = obtenerRangoHora();
-    let personas = Math.floor(Math.random() * (maxPersonas - minPersonas + 1)) + minPersonas;
-  
-    function actualizarContadorGradualmente() {
-      const [nuevoMin, nuevoMax] = obtenerRangoHora();
-  
-      // Si cambió el bloque horario, actualizamos los límites
-      if (nuevoMin !== minPersonas || nuevoMax !== maxPersonas) {
-        minPersonas = nuevoMin;
-        maxPersonas = nuevoMax;
-        personas = Math.floor(Math.random() * (maxPersonas - minPersonas + 1)) + minPersonas;
-      }
-  
-      let cambio = Math.floor(Math.random() * 3) - 1; // -1, 0 o +1
-      if (Math.random() < 0.3) cambio *= 2; // A veces cambia de 2 en 2
-      let nuevoValor = personas + cambio;
-      personas = Math.min(maxPersonas, Math.max(minPersonas, nuevoValor));
-      document.getElementById('contadorTexto').textContent = `${personas} personas activas`;
-    }
-  
-    setInterval(actualizarContadorGradualmente, 4000);
-    actualizarContadorGradualmente();
-  
-    function mostrarModal() {
-      const modal = document.getElementById("miModal");
-      const content = document.getElementById("modalContent");
-      modal.classList.remove("animarSalida");
-      content.classList.remove("animarContenidoSalida");
-      modal.style.display = "flex";
-      void modal.offsetWidth;
-      void content.offsetWidth;
-      modal.style.animation = "fadeIn 0.3s ease forwards";
-      content.style.animation = "scaleIn 0.3s ease forwards";
-    }
-  
-    function cerrarModal() {
-      const modal = document.getElementById("miModal");
-      const content = document.getElementById("modalContent");
-      modal.classList.add("animarSalida");
-      content.classList.add("animarContenidoSalida");
-      setTimeout(() => {
-        modal.style.display = "none";
-      }, 300);
-    }
-  
-    window.onclick = function(event) {
-      const modal = document.getElementById("miModal");
-      if (event.target == modal) cerrarModal();
-    }
-  
-    window.addEventListener('pageshow', () => {
-      document.body.classList.remove('fade-out');
-      document.body.style.opacity = '1';
-    });
-    
-    const imagenesTemario = ["/static/mat.png", "/static/com.png"];
-    let indiceActual = 0;
-    
-    function cambiarImagen(direccion) {
-      indiceActual = (indiceActual + direccion + imagenesTemario.length) % imagenesTemario.length;
-      document.getElementById("imagenTemario").src = imagenesTemario[indiceActual];
-    }
-    
-    function mostrarModal() {
-      const modal = document.getElementById("miModal");
-      const content = document.getElementById("modalContent");
-      indiceActual = 0; // Siempre comienza con la primera imagen
-      document.getElementById("imagenTemario").src = imagenesTemario[indiceActual];
-      modal.classList.remove("animarSalida");
-      content.classList.remove("animarContenidoSalida");
-      modal.style.display = "flex";
-      void modal.offsetWidth;
-      void content.offsetWidth;
-      modal.style.animation = "fadeIn 0.3s ease forwards";
-      content.style.animation = "scaleIn 0.3s ease forwards";
-    }
-    
-  </script>
+        // Función para lanzar confeti
+        function lanzarConfeti() {
+            confetti({
+                particleCount: 150,
+                spread: 70,
+                origin: { y: 0.6 }
+            });
+        }
 
+        // Manejar el envío del formulario
+        document.getElementById('login-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+
+            // Validación simple (en un caso real, esto se conectaría a un backend)
+            if (username && password) {
+                // Mostrar la fecha de hoy en el mensaje de éxito
+                document.getElementById('fecha-asistencia').textContent = 
+                    "Tu asistencia a la clase del " + obtenerFechaHoy() + " ha sido registrada.";
+                
+                // Ocultar formulario y mostrar pantalla de éxito
+                document.getElementById('login-screen').style.display = 'none';
+                document.getElementById('success-screen').style.display = 'block';
+                
+                // Lanzar animación de confeti
+                lanzarConfeti();
+            } else {
+                alert("Por favor, complete todos los campos.");
+            }
+        });
+    </script>
 </body>
 </html>
