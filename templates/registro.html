@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Registro Academia BECA 18</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    /* --- Reset y fuentes --- */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', sans-serif;
+    }
+
+    body {
+      background: #f3f5f9;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    /* --- Contenedor principal --- */
+    .container {
+      display: flex;
+      background: #fff;
+      border-radius: 20px;
+      overflow: hidden;
+      max-width: 1100px;
+      width: 85%; /* margen proporcional */
+      box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+    }
+
+    /* --- Sección izquierda --- */
+    .info-section {
+      flex: 1;
+      background: #0066cc;
+      color: #fff;
+      padding: 50px 40px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .info-section h1 {
+      font-size: 26px;
+      font-weight: bold;
+      margin-bottom: 15px;
+    }
+
+    .info-section p {
+      font-size: 15px;
+      line-height: 1.5;
+      margin-bottom: 15px;
+    }
+
+    .info-section ul {
+      margin: 15px 0;
+      padding-left: 15px;
+    }
+
+    .info-section ul li {
+      margin-bottom: 8px;
+      font-size: 14px;
+    }
+
+    .info-section ul li i {
+      margin-right: 8px;
+      color: #fff;
+    }
+
+    .info-section .icon {
+      font-size: 60px;
+      text-align: right;
+      opacity: 0.8;
+    }
+
+    /* --- Sección derecha (formulario) --- */
+    .card {
+      flex: 1;
+      padding: 40px 30px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .logo-section {
+      text-align: center;
+      margin-bottom: 25px;
+    }
+
+    .logo-section img {
+      width: 70px;
+      margin-bottom: 10px;
+    }
+
+    .logo-section h2 {
+      font-size: 20px;
+      margin-bottom: 4px;
+      font-weight: bold;
+    }
+
+    .logo-section p {
+      font-size: 14px;
+      color: #555;
+    }
+
+    .form-row {
+      display: flex;
+      gap: 15px;
+      margin-bottom: 15px;
+      width: 100%;
+    }
+
+    .input-group {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      background: #fff;
+      border: 1px solid #ddd;
+      border-radius: 12px;
+      padding: 12px;
+    }
+
+    .input-group i {
+      margin-right: 8px;
+      color: #888;
+      font-size: 14px;
+    }
+
+    .input-group input,
+    .input-group select {
+      border: none;
+      outline: none;
+      font-size: 14px;
+      width: 100%;
+      background: transparent;
+    }
+
+    .register-btn {
+      background: #0066cc;
+      color: #fff;
+      border: none;
+      padding: 14px;
+      border-radius: 12px;
+      font-size: 15px;
+      cursor: pointer;
+      margin-top: 10px;
+      width: 100%;
+      font-weight: bold;
+      transition: 0.3s;
+    }
+
+    .register-btn:hover {
+      background: #004da8;
+    }
+
+    /* --- Responsivo --- */
+    @media (max-width: 991px) {
+      .container {
+        flex-direction: column;
+        width: 95%; /* más compacto */
+      }
+
+      .info-section {
+        padding: 30px 20px;
+        text-align: center;
+      }
+
+      .info-section .icon {
+        text-align: center;
+        margin-top: 20px;
+      }
+
+      .card {
+        padding: 30px 20px;
+      }
+    }
+
+    @media (max-width: 600px) {
+      .form-row {
+        flex-direction: column; /* inputs apilados en pantallas chicas */
+        gap: 12px;
+      }
+
+      .input-group {
+        padding: 10px;
+        border-radius: 10px;
+      }
+
+      .register-btn {
+        padding: 12px;
+        font-size: 14px;
+        border-radius: 10px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Sección izquierda -->
+    <div class="info-section">
+      <div>
+        <h1>¡Bienvenido a la Academia BECA 18!</h1>
+        <p>Estás a un paso de formar parte de nuestro programa de preparación para el examen de admisión 2026-I.</p>
+        <ul>
+          <li><i class="fas fa-check-circle"></i> Clases dirigidas por profesionales especializados</li>
+          <li><i class="fas fa-check-circle"></i> Material de estudio actualizado</li>
+          <li><i class="fas fa-check-circle"></i> Simulacros de examen periódicos</li>
+          <li><i class="fas fa-check-circle"></i> Asesoría personalizada</li>
+        </ul>
+        <p>Completa el formulario para iniciar tu proceso de inscripción.</p>
+      </div>
+      <div class="icon"><i class="fas fa-graduation-cap"></i></div>
+    </div>
+
+    <!-- Sección derecha -->
+    <div class="card">
+      <div class="logo-section">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Placeholder_view_vector.svg/512px-Placeholder_view_vector.svg.png" alt="Logo">
+        <h2>ACADEMIA BECA 18</h2>
+        <p>Registro de Aspirantes 2026-I</p>
+      </div>
+
+      <form>
+        <div class="form-row">
+          <div class="input-group">
+            <i class="fas fa-user"></i>
+            <input type="text" placeholder="Nombre Completo">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="input-group">
+            <i class="fas fa-id-card"></i>
+            <input type="text" placeholder="DNI">
+          </div>
+          <div class="input-group">
+            <i class="fas fa-phone"></i>
+            <input type="text" placeholder="Celular">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="input-group">
+            <i class="fas fa-graduation-cap"></i>
+            <select>
+              <option>Selecciona carrera</option>
+              <option>Carrera 1</option>
+              <option>Carrera 2</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="input-group">
+            <i class="fas fa-laptop"></i>
+            <select>
+              <option>Modalidad</option>
+              <option>Virtual</option>
+              <option>Presencial</option>
+            </select>
+          </div>
+          <div class="input-group">
+            <i class="fas fa-map-marker-alt"></i>
+            <input type="text" placeholder="Región">
+          </div>
+        </div>
+        <button type="submit" class="register-btn">Registrarse</button>
+      </form>
+    </div>
+  </div>
+</body>
+</html>
