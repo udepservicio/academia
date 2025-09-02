@@ -1,3 +1,5 @@
+
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -200,58 +202,6 @@
             opacity: 0.9;
         }
 
-        /* Pantalla de carga */
-        #loading-screen {
-            display: none;
-            text-align: center;
-            padding: 40px 20px;
-        }
-
-        .loading-spinner {
-            width: 60px;
-            height: 60px;
-            border: 5px solid rgba(30, 58, 95, 0.2);
-            border-radius: 50%;
-            border-top: 5px solid var(--accent);
-            animation: spin 1s linear infinite;
-            margin: 0 auto 25px;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        .loading-text {
-            font-size: 18px;
-            color: var(--text-primary);
-            margin-bottom: 15px;
-        }
-
-        .progress-container {
-            width: 100%;
-            height: 12px;
-            background-color: rgba(30, 58, 95, 0.1);
-            border-radius: 10px;
-            overflow: hidden;
-            margin: 0 auto;
-        }
-
-        .progress-bar {
-            height: 100%;
-            width: 0%;
-            background: linear-gradient(90deg, var(--accent), #3a6cb5);
-            border-radius: 10px;
-            transition: width 0.4s ease;
-            animation: loading 2s infinite;
-        }
-
-        @keyframes loading {
-            0% { width: 0%; }
-            50% { width: 70%; }
-            100% { width: 100%; }
-        }
-
         /* Pantalla de éxito */
         #success-screen {
             display: none;
@@ -381,16 +331,6 @@
             
             .logo-section p {
                 font-size: 13px;
-            }
-            
-            .loading-spinner {
-                width: 50px;
-                height: 50px;
-                margin-bottom: 20px;
-            }
-            
-            .loading-text {
-                font-size: 16px;
             }
         }
 
@@ -533,15 +473,6 @@
                 </form>
             </div>
 
-            <!-- Pantalla de carga -->
-            <div id="loading-screen">
-                <div class="loading-spinner"></div>
-                <div class="loading-text">Procesando tu registro...</div>
-                <div class="progress-container">
-                    <div class="progress-bar"></div>
-                </div>
-            </div>
-
             <!-- Pantalla de éxito -->
             <div id="success-screen">
                 <div class="success-icon">
@@ -560,6 +491,12 @@
             </div>
         </div>
     </div>
+
+
+
+    
+
+
 
     <script>
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzc1vNYwn6Ml-ndQVnY__HpwJWN8kelLd4bLHxGNuf7PytDrw4K485nRi1-Ei7Te5yd0Q/exec"; // pon la URL de tu AppScript desplegado
@@ -593,11 +530,6 @@
         }
     
         try {
-            // Mostrar pantalla de carga
-            document.getElementById('register-screen').style.display = 'none';
-            document.getElementById('loading-screen').style.display = 'block';
-            document.getElementById('success-screen').style.display = 'none';
-            
             const formData = new FormData();
             formData.append('nombre', nombre);
             formData.append('dni', dni);
@@ -609,22 +541,15 @@
             const response = await fetch(SCRIPT_URL, { method: 'POST', body: formData });
             const result = await response.text();
     
-            // Ocultar pantalla de carga
-            document.getElementById('loading-screen').style.display = 'none';
-            
             if (result.includes("✅")) {
                 document.getElementById('success-name').textContent = `¡Felicidades ${nombre}!`;
+                document.getElementById('register-screen').style.display = 'none';
                 document.getElementById('success-screen').style.display = 'block';
                 lanzarConfeti();
             } else {
-                // En caso de error, volver al formulario
-                document.getElementById('register-screen').style.display = 'block';
                 alert("❌ Error al registrar: " + result);
             }
         } catch (error) {
-            // En caso de error, volver al formulario
-            document.getElementById('loading-screen').style.display = 'none';
-            document.getElementById('register-screen').style.display = 'block';
             alert("❌ Error en la conexión: " + error.message);
         }
     });
@@ -634,5 +559,9 @@
         document.body.classList.add("fade-in");
     });
     </script>
+
+    
+
+    
 </body>
 </html>
