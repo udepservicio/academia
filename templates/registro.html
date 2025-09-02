@@ -1,5 +1,4 @@
 
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -9,6 +8,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
     <style>
         :root {
             --base-color: #d1d9e6;
@@ -202,6 +204,58 @@
             opacity: 0.9;
         }
 
+        /* Pantalla de carga */
+        #loading-screen {
+            display: none;
+            text-align: center;
+            padding: 40px 20px;
+        }
+
+        .loading-spinner {
+            width: 60px;
+            height: 60px;
+            border: 5px solid rgba(30, 58, 95, 0.2);
+            border-radius: 50%;
+            border-top: 5px solid var(--accent);
+            animation: spin 1s linear infinite;
+            margin: 0 auto 25px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .loading-text {
+            font-size: 18px;
+            color: var(--text-primary);
+            margin-bottom: 15px;
+        }
+
+        .progress-container {
+            width: 100%;
+            height: 12px;
+            background-color: rgba(30, 58, 95, 0.1);
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 0 auto;
+        }
+
+        .progress-bar {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, var(--accent), #3a6cb5);
+            border-radius: 10px;
+            transition: width 0.4s ease;
+            animation: loading 2s infinite;
+        }
+
+        @keyframes loading {
+            0% { width: 0%; }
+            50% { width: 70%; }
+            100% { width: 100%; }
+        }
+
         /* Pantalla de éxito */
         #success-screen {
             display: none;
@@ -269,17 +323,13 @@
                 display: flex;
             }
             .container {
-              
                 flex-direction: row;
                 box-shadow: none;
-               
             }
             .card {
-                
                 flex: 1.2;
                 padding: 40px;
                 border-radius: 0 30px 30px 0;
-                
             }
         }
 
@@ -291,10 +341,8 @@
             }
             
             .container {
-                
                 flex-direction: column;
                 border-radius: 15px;
-                
             }
             
             .card {
@@ -332,6 +380,16 @@
             .logo-section p {
                 font-size: 13px;
             }
+            
+            .loading-spinner {
+                width: 50px;
+                height: 50px;
+                margin-bottom: 20px;
+            }
+            
+            .loading-text {
+                font-size: 16px;
+            }
         }
 
         @media (max-width: 480px) {
@@ -361,7 +419,6 @@
                 </ul>
                 <p>Completa el formulario para iniciar tu proceso de inscripción.</p>
             </div>
-
         </div>
 
         <!-- Panel de formulario -->
@@ -473,6 +530,15 @@
                 </form>
             </div>
 
+            <!-- Pantalla de carga -->
+            <div id="loading-screen">
+                <div class="loading-spinner"></div>
+                <div class="loading-text">Procesando tu registro...</div>
+                <div class="progress-container">
+                    <div class="progress-bar"></div>
+                </div>
+            </div>
+
             <!-- Pantalla de éxito -->
             <div id="success-screen">
                 <div class="success-icon">
@@ -492,14 +558,20 @@
         </div>
     </div>
 
-
-
-    
-
-
-
     <script>
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzc1vNYwn6Ml-ndQVnY__HpwJWN8kelLd4bLHxGNuf7PytDrw4K485nRi1-Ei7Te5yd0Q/exec"; // pon la URL de tu AppScript desplegado
+    // Configuración de Firebase
+    const firebaseConfig = {
+        apiKey: "AIzaSyCohuXeXlI6z8R0RXEIWeL4atI9zkpj_i4",
+        authDomain: "academia-udep-43440.firebaseapp.com",
+        projectId: "academia-udep-43440",
+        storageBucket: "academia-udep-43440.firebasestorage.app",
+        messagingSenderId: "853553587165",
+        appId: "1:853553587165:web:d2fd928f520d51276e4c34"
+    };
+
+    // Inicializar Firebase
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
     
     function lanzarConfeti() {
         confetti({
@@ -530,27 +602,35 @@
         }
     
         try {
-            const formData = new FormData();
-            formData.append('nombre', nombre);
-            formData.append('dni', dni);
-            formData.append('celular', celular);
-            formData.append('carrera', carrera);
-            formData.append('modalidad', modalidad);
-            formData.append('region', region);
+            // Mostrar pantalla de carga
+            document.getElementById('register-screen').style.display = 'none';
+            document.getElementById('loading-screen').style.display = 'block';
+            document.getElementById('success-screen').style.display = 'none';
+            
+            // Guardar datos en Firestore
+            await db.collection("registros").add({
+                nombre: nombre,
+                dni: dni,
+                celular: celular,
+                carrera: carrera,
+                modalidad: modalidad,
+                region: region,
+                fecha: firebase.firestore.FieldValue.serverTimestamp()
+            });
     
-            const response = await fetch(SCRIPT_URL, { method: 'POST', body: formData });
-            const result = await response.text();
-    
-            if (result.includes("✅")) {
-                document.getElementById('success-name').textContent = `¡Felicidades ${nombre}!`;
-                document.getElementById('register-screen').style.display = 'none';
-                document.getElementById('success-screen').style.display = 'block';
-                lanzarConfeti();
-            } else {
-                alert("❌ Error al registrar: " + result);
-            }
+            // Ocultar pantalla de carga
+            document.getElementById('loading-screen').style.display = 'none';
+            
+            // Mostrar pantalla de éxito
+            document.getElementById('success-name').textContent = `¡Felicidades ${nombre}!`;
+            document.getElementById('success-screen').style.display = 'block';
+            lanzarConfeti();
+            
         } catch (error) {
-            alert("❌ Error en la conexión: " + error.message);
+            // En caso de error, volver al formulario
+            document.getElementById('loading-screen').style.display = 'none';
+            document.getElementById('register-screen').style.display = 'block';
+            alert("❌ Error al registrar: " + error.message);
         }
     });
     
@@ -559,9 +639,5 @@
         document.body.classList.add("fade-in");
     });
     </script>
-
-    
-
-    
 </body>
 </html>
