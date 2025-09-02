@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Dashboard - Gestión de Asistencias</title>
+<title>Dashboard - Gestión de Alumnos</title>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <style>
@@ -48,12 +48,16 @@
     color: white;
     padding: 20px 0;
     box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+    transition: transform 0.3s ease;
   }
   
   .logo {
     padding: 0 20px 20px;
     border-bottom: 1px solid rgba(255,255,255,0.1);
     margin-bottom: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
   }
   
   .logo h1 {
@@ -66,6 +70,15 @@
   
   .logo i {
     font-size: 1.5rem;
+  }
+  
+  .menu-toggle {
+    display: none;
+    background: none;
+    border: none;
+    color: white;
+    font-size: 1.2rem;
+    cursor: pointer;
   }
   
   .tabs {
@@ -223,6 +236,7 @@
     box-shadow: 0 1px 6px rgba(0,0,0,0.05);
     overflow: auto;
     margin-bottom: 15px;
+    max-height: 70vh;
   }
   
   table {
@@ -287,6 +301,33 @@
   
   .delete-btn:hover {
     color: var(--danger);
+  }
+  
+  /* Estadísticas */
+  .stats-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+    margin-bottom: 20px;
+  }
+  
+  .stat-card {
+    background: white;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+  }
+  
+  .stat-card h3 {
+    color: var(--primary);
+    margin-top: 0;
+    margin-bottom: 15px;
+    font-size: 1rem;
+  }
+  
+  .chart-container {
+    position: relative;
+    height: 250px;
   }
   
   /* User Detail Modal */
@@ -473,10 +514,35 @@
   @media (max-width: 900px) {
     .container {
       grid-template-columns: 1fr;
+      position: relative;
     }
     
     .sidebar {
-      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 100%;
+      z-index: 1000;
+      transform: translateX(-100%);
+    }
+    
+    .sidebar.active {
+      transform: translateX(0);
+    }
+    
+    .menu-toggle {
+      display: block;
+      position: fixed;
+      top: 15px;
+      left: 15px;
+      z-index: 1001;
+      background: var(--primary);
+      border-radius: 5px;
+      padding: 5px 10px;
+    }
+    
+    .main-content {
+      padding-top: 60px;
     }
     
     .actions {
@@ -495,6 +561,10 @@
     .course-stats {
       grid-template-columns: 1fr;
     }
+    
+    .stats-container {
+      grid-template-columns: 1fr;
+    }
   }
 </style>
 
@@ -504,25 +574,34 @@
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
 <!-- SheetJS (para exportar a Excel) -->
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
 
+<button class="menu-toggle" onclick="toggleSidebar()">
+  <i class="fas fa-bars"></i>
+</button>
+
 <div class="container">
   <!-- Sidebar -->
-  <div class="sidebar">
+  <div class="sidebar" id="sidebar">
     <div class="logo">
-      <h1><i class="fas fa-chalkboard-teacher"></i> Asistencias</h1>
+      <h1><i class="fas fa-user-graduate"></i> Alumnos</h1>
+      <button class="menu-toggle" onclick="toggleSidebar()">
+        <i class="fas fa-times"></i>
+      </button>
     </div>
     
     <div class="tabs">
-      <button class="tab-btn active" onclick="cambiarTab('asistencias')">
+      <button class="tab-btn" onclick="cambiarTab('asistencias')">
         <i class="fas fa-clipboard-check"></i> Asistencias
       </button>
-      <button class="tab-btn" onclick="cambiarTab('alumnos')">
-        <i class="fas fa-user-graduate"></i> Alumnos
+      <button class="tab-btn active" onclick="cambiarTab('alumnos')">
+        <i class="fas fa-users"></i> Alumnos
       </button>
-      <button class="tab-btn" onclick="cambiarTab('cursos')">
-        <i class="fas fa-book"></i> Cursos
+      <button class="tab-btn" onclick="cambiarTab('estadisticas')">
+        <i class="fas fa-chart-pie"></i> Estadísticas
       </button>
     </div>
   </div>
@@ -530,30 +609,79 @@
   <!-- Main Content -->
   <div class="main-content">
     <div class="header">
-      <h2 id="tableTitle">Gestión de Asistencias</h2>
+      <h2 id="tableTitle">Gestión de Alumnos</h2>
       <div class="live-indicator">
         <div class="live-dot"></div>
         <span>En vivo</span>
       </div>
     </div>
     
-    <div class="actions">
-      <button class="btn btn-primary" onclick="agregarFila()">
-        <i class="fas fa-plus"></i> Agregar Fila
-      </button>
-      <button class="btn btn-success" id="saveBtn" disabled>
-        <i class="fas fa-save"></i> Guardar Cambios
-      </button>
-      <button class="btn btn-info" onclick="exportToExcel()">
-        <i class="fas fa-file-export"></i> Exportar a Excel
-      </button>
-    </div>
-    
-    <div class="table-container">
-      <table id="dataTable">
-        <thead id="tableHead"></thead>
-        <tbody id="tableBody"></tbody>
-      </table>
+    <div id="content-container">
+      <!-- Contenido para la pestaña de Alumnos -->
+      <div id="alumnos-content">
+        <div class="actions">
+          <button class="btn btn-primary" onclick="agregarFila()">
+            <i class="fas fa-plus"></i> Agregar Fila
+          </button>
+          <button class="btn btn-success" id="saveBtn" disabled>
+            <i class="fas fa-save"></i> Guardar Cambios
+          </button>
+          <button class="btn btn-info" onclick="exportToExcel()">
+            <i class="fas fa-file-export"></i> Exportar a Excel
+          </button>
+        </div>
+        
+        <div class="table-container">
+          <table id="dataTable">
+            <thead id="tableHead"></thead>
+            <tbody id="tableBody"></tbody>
+          </table>
+        </div>
+      </div>
+      
+      <!-- Contenido para la pestaña de Asistencias -->
+      <div id="asistencias-content" style="display: none;">
+        <div class="table-container">
+          <table id="asistenciasTable">
+            <thead>
+              <tr>
+                <th>Nombre</th>
+                <th>DNI</th>
+                <th>Total Asistencias</th>
+                <th>Última Asistencia</th>
+              </tr>
+            </thead>
+            <tbody id="asistenciasBody">
+            </tbody>
+          </table>
+        </div>
+      </div>
+      
+      <!-- Contenido para la pestaña de Estadísticas -->
+      <div id="estadisticas-content" style="display: none;">
+        <div class="stats-container">
+          <div class="stat-card">
+            <h3>Distribución por Carrera</h3>
+            <div class="chart-container">
+              <canvas id="carreraChart"></canvas>
+            </div>
+          </div>
+          
+          <div class="stat-card">
+            <h3>Distribución por Región</h3>
+            <div class="chart-container">
+              <canvas id="regionChart"></canvas>
+            </div>
+          </div>
+          
+          <div class="stat-card">
+            <h3>Distribución por Modalidad</h3>
+            <div class="chart-container">
+              <canvas id="modalidadChart"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
     
     <div class="loading" id="loadingIndicator">
@@ -598,11 +726,14 @@
   }
   
   const db = firebase.firestore();
-  let coleccionActual = "asistencias";
+  let coleccionActual = "alumnos";
   let datosLocal = {};
   let cambiosPendientes = false;
   let allKeys = [];
   let unsubscribe = null;
+  let charts = {};
+  let alumnosData = [];
+  let asistenciasData = [];
 
   // Referencias a elementos del DOM
   const saveBtn = document.getElementById("saveBtn");
@@ -611,6 +742,14 @@
   const tableTitle = document.getElementById("tableTitle");
   const userModal = document.getElementById("userModal");
   const userModalBody = document.getElementById("userModalBody");
+  const alumnosContent = document.getElementById("alumnos-content");
+  const asistenciasContent = document.getElementById("asistencias-content");
+  const estadisticasContent = document.getElementById("estadisticas-content");
+  const sidebar = document.getElementById("sidebar");
+
+  function toggleSidebar() {
+    sidebar.classList.toggle('active');
+  }
 
   function showNotification(message, type = "success") {
     notificationElement.textContent = message;
@@ -623,7 +762,7 @@
   }
 
   function cambiarTab(tab) {
-    if (cambiosPendientes) {
+    if (cambiosPendientes && tab !== coleccionActual) {
       if (!confirm("Tienes cambios sin guardar. ¿Estás seguro de que quieres cambiar de pestaña?")) {
         return;
       }
@@ -633,16 +772,32 @@
     document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
     document.querySelector(`.tab-btn[onclick="cambiarTab('${tab}')"]`).classList.add("active");
     
-    // Actualizar título
-    const titles = {
-      'asistencias': 'Gestión de Asistencias',
-      'alumnos': 'Gestión de Alumnos',
-      'cursos': 'Gestión de Cursos'
-    };
-    tableTitle.textContent = titles[tab] || 'Gestión de Datos';
+    // Ocultar todos los contenidos primero
+    alumnosContent.style.display = 'none';
+    asistenciasContent.style.display = 'none';
+    estadisticasContent.style.display = 'none';
     
-    // Cargar datos de la nueva colección
-    cargarTabla();
+    // Actualizar título y contenido según la pestaña
+    if (tab === 'estadisticas') {
+      tableTitle.textContent = 'Estadísticas de Alumnos';
+      estadisticasContent.style.display = 'block';
+      cargarEstadisticas();
+    } else if (tab === 'asistencias') {
+      tableTitle.textContent = 'Gestión de Asistencias';
+      asistenciasContent.style.display = 'block';
+      cargarAsistencias();
+    } else {
+      tableTitle.textContent = 'Gestión de Alumnos';
+      alumnosContent.style.display = 'block';
+      
+      // Cargar datos de la nueva colección
+      cargarTabla();
+    }
+    
+    // En móvil, cerrar el sidebar al cambiar de pestaña
+    if (window.innerWidth <= 900) {
+      sidebar.classList.remove('active');
+    }
   }
 
   function formatearValor(valor) {
@@ -678,14 +833,8 @@
       unsubscribe();
     }
 
-    // Determinar qué colección cargar según la pestaña seleccionada
-    let collectionName = coleccionActual;
-    if (coleccionActual === 'alumnos') {
-      collectionName = 'registros'; // Usar la colección "registro" para la pestaña Alumnos
-    }
-
     // Usar onSnapshot para sincronización en tiempo real
-    unsubscribe = db.collection(collectionName).onSnapshot(snapshot => {
+    unsubscribe = db.collection("registros").onSnapshot(snapshot => {
       loadingIndicator.style.display = "none";
       
       head.innerHTML = "";
@@ -702,11 +851,16 @@
         Object.keys(doc.data()).forEach(key => allKeys.add(key));
       });
       
-      // Convertir a array y asegurar que 'dni' esté primero si existe
+      // Convertir a array y ordenar según el orden deseado
       allKeys = Array.from(allKeys);
-      if (allKeys.includes('dni')) {
-        allKeys = ['dni', ...allKeys.filter(key => key !== 'dni')];
-      }
+      
+      // Orden personalizado para la colección registros
+      const ordenDeseado = ['nombre', 'dni', 'carrera', 'region', 'modalidad', 'celular', 'fecha'];
+      allKeys = ordenDeseado.filter(key => allKeys.includes(key));
+      
+      // Agregar cualquier campo adicional que no esté en el orden deseado
+      const camposAdicionales = allKeys.filter(key => !ordenDeseado.includes(key));
+      allKeys = allKeys.concat(camposAdicionales);
       
       // Crear encabezados
       let trHead = "<tr>";
@@ -733,14 +887,10 @@
         
         // Botones de acción
         tr += `<td class="actions-cell">`;
-        
-        if (collectionName === 'registro') {
-          tr += `<button class="icon-btn" onclick="verDetallesAlumno('${doc.id}')" title="Ver detalles">
-                    <i class="fas fa-eye"></i>
-                 </button>`;
-        }
-        
-        tr += `<button class="icon-btn delete-btn" onclick="eliminarFila('${doc.id}', '${collectionName}')" title="Eliminar">
+        tr += `<button class="icon-btn" onclick="verDetallesAlumno('${doc.id}')" title="Ver detalles">
+                  <i class="fas fa-eye"></i>
+               </button>`;
+        tr += `<button class="icon-btn delete-btn" onclick="eliminarFila('${doc.id}', 'registros')" title="Eliminar">
                   <i class="fas fa-trash"></i>
                </button>
               </td>`;
@@ -755,27 +905,197 @@
     });
   }
 
+  function cargarAsistencias() {
+    loadingIndicator.style.display = "block";
+    
+    // Obtener todos los registros de alumnos
+    db.collection("registros").get().then(registrosSnapshot => {
+      alumnosData = [];
+      registrosSnapshot.forEach(doc => {
+        alumnosData.push({ id: doc.id, ...doc.data() });
+      });
+      
+      // Obtener todas las asistencias
+      return db.collection("asistencias").get();
+    }).then(asistenciasSnapshot => {
+      asistenciasData = [];
+      asistenciasSnapshot.forEach(doc => {
+        asistenciasData.push({ id: doc.id, ...doc.data() });
+      });
+      
+      // Procesar datos para mostrar asistencias por alumno
+      mostrarAsistenciasPorAlumno();
+      loadingIndicator.style.display = "none";
+    }).catch(error => {
+      loadingIndicator.style.display = "none";
+      console.error("Error cargando asistencias: ", error);
+      showNotification("Error cargando asistencias: " + error.message, "error");
+    });
+  }
+
+  function mostrarAsistenciasPorAlumno() {
+    const asistenciasBody = document.getElementById("asistenciasBody");
+    asistenciasBody.innerHTML = "";
+    
+    // Contar asistencias por DNI
+    const asistenciasPorDni = {};
+    asistenciasData.forEach(asistencia => {
+      const dni = asistencia.dni;
+      if (!asistenciasPorDni[dni]) {
+        asistenciasPorDni[dni] = {
+          count: 0,
+          lastDate: null
+        };
+      }
+      
+      asistenciasPorDni[dni].count++;
+      
+      // Obtener la fecha más reciente
+      if (asistencia.fecha && typeof asistencia.fecha.toDate === 'function') {
+        const fecha = asistencia.fecha.toDate();
+        if (!asistenciasPorDni[dni].lastDate || fecha > asistenciasPorDni[dni].lastDate) {
+          asistenciasPorDni[dni].lastDate = fecha;
+        }
+      }
+    });
+    
+    // Crear filas para cada alumno
+    alumnosData.forEach(alumno => {
+      const dni = alumno.dni;
+      const asistencias = asistenciasPorDni[dni] || { count: 0, lastDate: null };
+      
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td>${alumno.nombre || 'No especificado'}</td>
+        <td>${dni || 'No especificado'}</td>
+        <td>${asistencias.count}</td>
+        <td>${asistencias.lastDate ? asistencias.lastDate.toLocaleDateString() : 'Nunca'}</td>
+      `;
+      
+      asistenciasBody.appendChild(tr);
+    });
+  }
+
+  function cargarEstadisticas() {
+    loadingIndicator.style.display = "block";
+    
+    // Obtener todos los alumnos
+    db.collection('registros').get().then(snapshot => {
+      loadingIndicator.style.display = "none";
+      
+      if (snapshot.empty) {
+        showNotification("No hay datos para mostrar estadísticas", "error");
+        return;
+      }
+      
+      const datos = [];
+      snapshot.forEach(doc => {
+        datos.push(doc.data());
+      });
+      
+      // Procesar datos para estadísticas
+      procesarDatosEstadisticas(datos);
+    }).catch(error => {
+      loadingIndicator.style.display = "none";
+      console.error("Error cargando estadísticas: ", error);
+      showNotification("Error cargando estadísticas: " + error.message, "error");
+    });
+  }
+
+  function procesarDatosEstadisticas(datos) {
+    // Estadísticas por carrera
+    const carreras = {};
+    datos.forEach(alumno => {
+      const carrera = alumno.carrera || 'Sin especificar';
+      carreras[carrera] = (carreras[carrera] || 0) + 1;
+    });
+    
+    // Estadísticas por región
+    const regiones = {};
+    datos.forEach(alumno => {
+      const region = alumno.region || 'Sin especificar';
+      regiones[region] = (regiones[region] || 0) + 1;
+    });
+    
+    // Estadísticas por modalidad
+    const modalidades = {};
+    datos.forEach(alumno => {
+      const modalidad = alumno.modalidad || 'Sin especificar';
+      modalidades[modalidad] = (modalidades[modalidad] || 0) + 1;
+    });
+    
+    // Crear gráficos
+    crearGrafico('carreraChart', 'Carreras', carreras);
+    crearGrafico('regionChart', 'Regiones', regiones);
+    crearGrafico('modalidadChart', 'Modalidades', modalidades);
+  }
+
+  function crearGrafico(canvasId, titulo, datos) {
+    const ctx = document.getElementById(canvasId).getContext('2d');
+    
+    // Destruir gráfico existente si hay uno
+    if (charts[canvasId]) {
+      charts[canvasId].destroy();
+    }
+    
+    // Preparar datos para el gráfico
+    const labels = Object.keys(datos);
+    const values = Object.values(datos);
+    
+    // Colores para el gráfico
+    const backgroundColors = [
+      '#1E3A5F', '#4A6FA5', '#28a745', '#dc3545', '#ffc107', 
+      '#17a2b8', '#6f42c1', '#e83e8c', '#fd7e14', '#20c997'
+    ];
+    
+    charts[canvasId] = new Chart(ctx, {
+      type: 'pie',
+      data: {
+        labels: labels,
+        datasets: [{
+          data: values,
+          backgroundColor: backgroundColors,
+          borderColor: '#fff',
+          borderWidth: 1
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            position: 'right',
+            labels: {
+              boxWidth: 15,
+              padding: 15
+            }
+          },
+          title: {
+            display: true,
+            text: titulo
+          }
+        }
+      }
+    });
+  }
+
   function habilitarGuardado() {
     cambiosPendientes = true;
     saveBtn.disabled = false;
   }
 
   function agregarFila() {
-    // Determinar en qué colección agregar
-    let collectionName = coleccionActual;
-    if (coleccionActual === 'alumnos') {
-      collectionName = 'registro';
-    }
-    
     // Crear un nuevo documento con valores por defecto
-    const nuevoDocRef = db.collection(collectionName).doc();
-    const datosPorDefecto = {};
-    
-    // Establecer valores por defecto para campos conocidos
-    if (allKeys.includes('dni')) datosPorDefecto.dni = '';
-    if (allKeys.includes('fecha')) datosPorDefecto.fecha = firebase.firestore.FieldValue.serverTimestamp();
-    if (allKeys.includes('codigoDia')) datosPorDefecto.codigoDia = '';
-    if (allKeys.includes('nombre')) datosPorDefecto.nombre = '';
+    const nuevoDocRef = db.collection("registros").doc();
+    const datosPorDefecto = {
+      nombre: '',
+      dni: '',
+      carrera: '',
+      region: '',
+      modalidad: '',
+      celular: '',
+      fecha: firebase.firestore.FieldValue.serverTimestamp()
+    };
     
     nuevoDocRef.set(datosPorDefecto)
       .then(() => {
@@ -787,14 +1107,7 @@
       });
   }
 
-  function eliminarFila(docId, collectionName = null) {
-    if (!collectionName) {
-      collectionName = coleccionActual;
-      if (coleccionActual === 'alumnos') {
-        collectionName = 'registro';
-      }
-    }
-    
+  function eliminarFila(docId, collectionName = "registros") {
     if (confirm("¿Estás seguro de que deseas eliminar esta fila?")) {
       db.collection(collectionName).doc(docId).delete()
         .then(() => {
@@ -810,8 +1123,8 @@
   function verDetallesAlumno(userId) {
     loadingIndicator.style.display = "block";
     
-    // Obtener datos del alumno desde la colección "registro"
-    db.collection('registro').doc(userId).get().then(userDoc => {
+    // Obtener datos del alumno desde la colección "registros"
+    db.collection('registros').doc(userId).get().then(userDoc => {
       if (!userDoc.exists) {
         showNotification("Alumno no encontrado", "error");
         loadingIndicator.style.display = "none";
@@ -820,120 +1133,49 @@
       
       const userData = userDoc.data();
       
-      // Obtener asistencias del alumno
-      db.collection('asistencias')
-        .where('dni', '==', userData.dni)
-        .get()
-        .then(asistenciasSnapshot => {
-          loadingIndicator.style.display = "none";
+      // Construir el modal con la información del alumno
+      userModalBody.innerHTML = `
+        <div class="user-info">
+          <div class="info-item">
+            <div class="info-label">Nombre</div>
+            <div class="info-value">${userData.nombre || 'No especificado'}</div>
+          </div>
           
-          let asistenciasHTML = '';
-          let totalAsistencias = 0;
+          <div class="info-item">
+            <div class="info-label">DNI</div>
+            <div class="info-value">${userData.dni || 'No especificado'}</div>
+          </div>
           
-          if (!asistenciasSnapshot.empty) {
-            totalAsistencias = asistenciasSnapshot.size;
-            
-            // Agrupar asistencias por curso
-            const asistenciasPorCurso = {};
-            
-            asistenciasSnapshot.forEach(doc => {
-              const data = doc.data();
-              const curso = data.curso || 'Sin curso asignado';
-              
-              if (!asistenciasPorCurso[curso]) {
-                asistenciasPorCurso[curso] = [];
-              }
-              
-              asistenciasPorCurso[curso].push(data);
-            });
-            
-            // Generar HTML para cada curso
-            for (const [curso, asistencias] of Object.entries(asistenciasPorCurso)) {
-              asistenciasHTML += `
-                <div class="course-card">
-                  <div class="course-header">
-                    <div class="course-title">${curso}</div>
-                    <div class="course-dates">${asistencias.length} asistencias</div>
-                  </div>
-                  
-                  <div class="course-stats">
-                    <div class="stat">
-                      <div class="stat-value">${asistencias.length}</div>
-                      <div class="stat-label">Total Asistencias</div>
-                    </div>
-                    <div class="stat">
-                      <div class="stat-value">${Math.round(asistencias.length / 30 * 100)}%</div>
-                      <div class="stat-label">Porcentaje</div>
-                    </div>
-                    <div class="stat">
-                      <div class="stat-value">${new Date(Math.max(...asistencias.map(a => a.fecha?.toDate?.() || new Date()))).toLocaleDateString()}</div>
-                      <div class="stat-label">Última asistencia</div>
-                    </div>
-                  </div>
-                  
-                  <div class="asistencias-list">
-                    <h5>Últimas asistencias:</h5>
-                    <ul>
-                      ${asistencias.slice(-5).map(a => `
-                        <li>${a.fecha ? a.fecha.toDate().toLocaleString() : 'Fecha no disponible'} - ${a.codigoDia || 'Sin código'}</li>
-                      `).join('')}
-                    </ul>
-                  </div>
-                </div>
-              `;
-            }
-          } else {
-            asistenciasHTML = '<p>El alumno no tiene asistencias registradas.</p>';
-          }
+          <div class="info-item">
+            <div class="info-label">Carrera</div>
+            <div class="info-value">${userData.carrera || 'No especificado'}</div>
+          </div>
           
-          // Construir el modal con la información del alumno
-          userModalBody.innerHTML = `
-            <div class="user-info">
-              <div class="info-item">
-                <div class="info-label">DNI</div>
-                <div class="info-value">${userData.dni || 'No especificado'}</div>
-              </div>
-              
-              <div class="info-item">
-                <div class="info-label">Nombre</div>
-                <div class="info-value">${userData.nombre || 'No especificado'}</div>
-              </div>
-              
-              <div class="info-item">
-                <div class="info-label">Email</div>
-                <div class="info-value">${userData.email || 'No especificado'}</div>
-              </div>
-              
-              <div class="info-item">
-                <div class="info-label">Teléfono</div>
-                <div class="info-value">${userData.telefono || 'No especificado'}</div>
-              </div>
-              
-              <div class="info-item">
-                <div class="info-label">Curso</div>
-                <div class="info-value">${userData.curso || 'No especificado'}</div>
-              </div>
-              
-              <div class="info-item">
-                <div class="info-label">Fecha de registro</div>
-                <div class="info-value">${userData.fechaRegistro ? userData.fechaRegistro.toDate().toLocaleDateString() : 'No especificado'}</div>
-              </div>
-            </div>
-            
-            <div class="user-courses">
-              <h4>Asistencias en cursos (${totalAsistencias} total)</h4>
-              ${asistenciasHTML}
-            </div>
-          `;
+          <div class="info-item">
+            <div class="info-label">Región</div>
+            <div class="info-value">${userData.region || 'No especificado'}</div>
+          </div>
           
-          // Mostrar el modal
-          userModal.classList.add('active');
-        })
-        .catch(error => {
-          loadingIndicator.style.display = "none";
-          console.error("Error obteniendo asistencias: ", error);
-          showNotification("Error obteniendo asistencias del alumno", "error");
-        });
+          <div class="info-item">
+            <div class="info-label">Modalidad</div>
+            <div class="info-value">${userData.modalidad || 'No especificado'}</div>
+          </div>
+          
+          <div class="info-item">
+            <div class="info-label">Celular</div>
+            <div class="info-value">${userData.celular || 'No especificado'}</div>
+          </div>
+          
+          <div class="info-item">
+            <div class="info-label">Fecha de registro</div>
+            <div class="info-value">${userData.fecha ? userData.fecha.toDate().toLocaleDateString() : 'No especificado'}</div>
+          </div>
+        </div>
+      `;
+      
+      // Mostrar el modal
+      userModal.classList.add('active');
+      loadingIndicator.style.display = "none";
     })
     .catch(error => {
       loadingIndicator.style.display = "none";
@@ -954,12 +1196,6 @@
     saveBtn.disabled = true;
     loadingIndicator.style.display = "block";
     loadingIndicator.querySelector("p").textContent = "Guardando cambios...";
-
-    // Determinar en qué colección guardar
-    let collectionName = coleccionActual;
-    if (coleccionActual === 'alumnos') {
-      collectionName = 'registro';
-    }
 
     rows.forEach(row => {
       const docId = row.getAttribute("data-id");
@@ -995,7 +1231,7 @@
       
       if (Object.keys(actualizacion).length > 0) {
         updates.push(
-          db.collection(collectionName).doc(docId).update(actualizacion)
+          db.collection("registros").doc(docId).update(actualizacion)
             .then(() => {
               console.log("Documento actualizado: ", docId);
               // Actualizar datos locales con los nuevos valores
@@ -1034,14 +1270,8 @@
     loadingIndicator.style.display = "block";
     loadingIndicator.querySelector("p").textContent = "Preparando datos para exportar...";
     
-    // Determinar qué colección exportar
-    let collectionName = coleccionActual;
-    if (coleccionActual === 'alumnos') {
-      collectionName = 'registro';
-    }
-    
     // Obtener todos los datos de la colección actual
-    db.collection(collectionName).get().then(snapshot => {
+    db.collection("registros").get().then(snapshot => {
       if (snapshot.empty) {
         showNotification("No hay datos para exportar", "error");
         loadingIndicator.style.display = "none";
@@ -1074,10 +1304,10 @@
       const colWidths = headers.map(() => ({ wch: 20 }));
       ws['!cols'] = colWidths;
       
-      XLSX.utils.book_append_sheet(wb, ws, collectionName);
+      XLSX.utils.book_append_sheet(wb, ws, "registros");
       
       // Exportar a archivo
-      XLSX.writeFile(wb, `${collectionName}_${new Date().toISOString().split('T')[0]}.xlsx`);
+      XLSX.writeFile(wb, `registros_${new Date().toISOString().split('T')[0]}.xlsx`);
       
       loadingIndicator.style.display = "none";
       showNotification("Datos exportados correctamente ✅");
@@ -1104,7 +1334,10 @@
   });
 
   // Cargar la primera pestaña al inicio
-  window.onload = cargarTabla;
+  window.onload = () => {
+    // Inicializar con la pestaña de alumnos activa
+    cambiarTab('alumnos');
+  };
 </script>
 
 </body>
