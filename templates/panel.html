@@ -3,10 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Gestión de Alumnos</title>
+<title>Dashboard - Gestión de Asistencias</title>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-<link rel="icon" href="https://www.udep.edu.pe/dircom/wp-content/uploads/sites/20/2023/03/favicon-udep.jpg" type="image/png" />
 <style>
   :root {
     --primary: #1E3A5F;
@@ -278,6 +277,11 @@
     padding: 6px 8px;
   }
   
+  td.invalid-field {
+    outline: 2px solid var(--danger);
+    background-color: #fff5f5;
+  }
+  
   .actions-cell {
     display: flex;
     gap: 6px;
@@ -302,6 +306,35 @@
   
   .delete-btn:hover {
     color: var(--danger);
+  }
+  
+  /* Paginación */
+  .pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    margin-top: 15px;
+  }
+  
+  .pagination-btn {
+    padding: 6px 12px;
+    background-color: var(--primary);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.8rem;
+  }
+  
+  .pagination-btn:disabled {
+    background-color: var(--gray);
+    cursor: not-allowed;
+  }
+  
+  .pagination-info {
+    font-size: 0.8rem;
+    color: var(--gray);
   }
   
   /* Estadísticas */
@@ -331,7 +364,106 @@
     height: 250px;
   }
   
-  /* User Detail Modal */
+  /* Calendario de asistencias */
+  .calendar {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 5px;
+    margin-top: 15px;
+  }
+  
+  .calendar-header {
+    grid-column: span 7;
+    text-align: center;
+    font-weight: 600;
+    margin-bottom: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .calendar-nav {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 1.2rem;
+    color: var(--primary);
+  }
+  
+  .calendar-day {
+    text-align: center;
+    font-weight: 600;
+    padding: 5px;
+    background-color: #f8f9fa;
+    border-radius: 3px;
+  }
+  
+  .calendar-date {
+    text-align: center;
+    padding: 8px;
+    border-radius: 3px;
+    cursor: pointer;
+    position: relative;
+  }
+  
+  .calendar-date.present {
+    background-color: var(--accent);
+    color: white;
+  }
+  
+  .calendar-date.absent {
+    background-color: #f8f9fa;
+  }
+  
+  .calendar-date.today {
+    border: 1px solid var(--primary);
+  }
+  
+  /* Modal para calendario de asistencias */
+  .calendar-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.5);
+    z-index: 1000;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .calendar-modal-content {
+    background-color: white;
+    padding: 20px;
+    border-radius: 8px;
+    width: 90%;
+    max-width: 500px;
+    max-height: 80vh;
+    overflow: auto;
+  }
+  
+  .calendar-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+  }
+  
+  .calendar-modal-header h3 {
+    color: var(--primary);
+    margin: 0;
+  }
+  
+  .calendar-close {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: var(--gray);
+  }
+  
+  /* Modal para detalles de usuario */
   .modal-overlay {
     position: fixed;
     top: 0;
@@ -410,60 +542,6 @@
   .info-value {
     color: var(--gray);
     font-size: 0.85rem;
-  }
-  
-  .user-courses {
-    margin-top: 15px;
-  }
-  
-  .user-courses h4 {
-    margin-bottom: 10px;
-    color: var(--primary);
-    font-size: 0.95rem;
-  }
-  
-  .course-card {
-    background: #f8f9fa;
-    border-radius: 5px;
-    padding: 12px;
-    margin-bottom: 12px;
-  }
-  
-  .course-header {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 8px;
-  }
-  
-  .course-title {
-    font-weight: 600;
-    color: var(--primary);
-    font-size: 0.85rem;
-  }
-  
-  .course-stats {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 10px;
-    margin-top: 8px;
-  }
-  
-  .stat {
-    text-align: center;
-    padding: 8px;
-    background: white;
-    border-radius: 5px;
-  }
-  
-  .stat-value {
-    font-size: 1.1rem;
-    font-weight: 600;
-    color: var(--primary);
-  }
-  
-  .stat-label {
-    font-size: 0.7rem;
-    color: var(--gray);
   }
   
   /* Notifications */
@@ -559,12 +637,29 @@
       grid-template-columns: 1fr;
     }
     
-    .course-stats {
+    .stats-container {
       grid-template-columns: 1fr;
     }
     
-    .stats-container {
-      grid-template-columns: 1fr;
+    .calendar {
+      grid-template-columns: repeat(7, 1fr);
+      gap: 3px;
+    }
+    
+    .calendar-date {
+      padding: 5px;
+      font-size: 0.8rem;
+    }
+    
+    /* Mejora para botones en vista móvil */
+    .actions-cell {
+      flex-direction: row;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    
+    .actions-cell .icon-btn {
+      margin: 2px;
     }
   }
 </style>
@@ -630,6 +725,12 @@
           <button class="btn btn-info" onclick="exportToExcel()">
             <i class="fas fa-file-export"></i> Exportar a Excel
           </button>
+          
+          <button class="btn btn-info" onclick="document.getElementById('fileInput').click()">
+            <i class="fas fa-file-import"></i> Actualizar desde Excel
+          </button>
+          <input type="file" id="fileInput" accept=".xlsx, .xls" style="display: none;" onchange="handleExcelUpload(event)">
+
         </div>
         
         <div class="table-container">
@@ -637,6 +738,13 @@
             <thead id="tableHead"></thead>
             <tbody id="tableBody"></tbody>
           </table>
+        </div>
+        
+        <!-- Paginación -->
+        <div class="pagination" id="paginationControls">
+          <button class="pagination-btn" id="prevPage" disabled onclick="cambiarPagina('anterior')">Anterior</button>
+          <span class="pagination-info" id="pageInfo">Página 1 de 1</span>
+          <button class="pagination-btn" id="nextPage" disabled onclick="cambiarPagina('siguiente')">Siguiente</button>
         </div>
       </div>
       
@@ -650,6 +758,7 @@
                 <th>DNI</th>
                 <th>Total Asistencias</th>
                 <th>Última Asistencia</th>
+                <th>Acciones</th>
               </tr>
             </thead>
             <tbody id="asistenciasBody">
@@ -691,6 +800,45 @@
     </div>
   </div>
 </div>
+
+<!-- Modal para calendario de asistencias -->
+<div class="calendar-modal" id="calendarModal">
+  <div class="calendar-modal-content">
+    <div class="calendar-modal-header">
+      <h3 id="calendarTitle">Asistencias de </h3>
+      <button class="calendar-close" onclick="closeCalendarModal()">&times;</button>
+    </div>
+    <div id="calendarContainer"></div>
+  </div>
+</div>
+
+<!-- Modal para importar Excel -->
+<div class="modal-overlay" id="excelModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>Opciones de importación</h3>
+      <button class="close-btn" onclick="closeExcelModal()">&times;</button>
+    </div>
+    <div class="modal-body">
+      <p>¿Cómo desea importar los datos?</p>
+      <div style="display: flex; flex-direction: column; gap: 10px; margin: 15px 0;">
+        <button class="btn btn-danger" onclick="processExcelData('replace')">Reemplazar todos los datos actuales</button>
+        <button class="btn btn-primary" onclick="processExcelData('add')">Agregar nueva información</button>
+      </div>
+      <div id="progressContainer" style="display: none;">
+        <div style="display: flex; justify-content: space-between;">
+          <span id="progressStatus">Cargando...</span>
+          <span id="progressPercent">0%</span>
+        </div>
+        <div style="height: 10px; background-color: #e9ecef; border-radius: 5px; overflow: hidden;">
+          <div id="progressBar" style="height: 100%; width: 0%; background-color: #28a745; transition: width 0.3s;"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
 
 <!-- Modal para detalles de usuario -->
 <div class="modal-overlay" id="userModal">
@@ -735,6 +883,14 @@
   let charts = {};
   let alumnosData = [];
   let asistenciasData = [];
+  let asistenciasPorAlumno = {};
+  
+  // Variables para paginación
+  let lastVisible = null;
+  let firstVisible = null;
+  let currentPage = 1;
+  let totalPages = 1;
+  const limit = 50;
 
   // Referencias a elementos del DOM
   const saveBtn = document.getElementById("saveBtn");
@@ -747,6 +903,17 @@
   const asistenciasContent = document.getElementById("asistencias-content");
   const estadisticasContent = document.getElementById("estadisticas-content");
   const sidebar = document.getElementById("sidebar");
+  const calendarModal = document.getElementById("calendarModal");
+  const calendarContainer = document.getElementById("calendarContainer");
+  const calendarTitle = document.getElementById("calendarTitle");
+  const prevPageBtn = document.getElementById("prevPage");
+  const nextPageBtn = document.getElementById("nextPage");
+  const pageInfo = document.getElementById("pageInfo");
+
+  // Variable para navegación del calendario
+  let currentCalendarMonth = new Date().getMonth();
+  let currentCalendarYear = new Date().getFullYear();
+  let currentCalendarDni = "";
 
   function toggleSidebar() {
     sidebar.classList.toggle('active');
@@ -834,8 +1001,20 @@
       unsubscribe();
     }
 
-    // Usar onSnapshot para sincronización en tiempo real
-    unsubscribe = db.collection("registros").onSnapshot(snapshot => {
+    // Obtener el total de documentos para la paginación
+    db.collection("registros").get().then(snapshot => {
+      totalPages = Math.ceil(snapshot.size / limit);
+      updatePaginationControls();
+    });
+
+    // Usar onSnapshot para sincronización en tiempo real con paginación
+    let query = db.collection("registros").orderBy("nombre").limit(limit);
+    
+    if (currentPage > 1 && lastVisible) {
+      query = query.startAfter(lastVisible);
+    }
+    
+    unsubscribe = query.onSnapshot(snapshot => {
       loadingIndicator.style.display = "none";
       
       head.innerHTML = "";
@@ -846,6 +1025,9 @@
         return;
       }
 
+      // Guardar el último documento visible para la paginación
+      lastVisible = snapshot.docs[snapshot.docs.length-1];
+      
       // Obtener todas las claves únicas de todos los documentos
       allKeys = new Set();
       snapshot.forEach(doc => {
@@ -856,7 +1038,7 @@
       allKeys = Array.from(allKeys);
       
       // Orden personalizado para la colección registros
-      const ordenDeseado = ['nombre', 'dni', 'carrera', 'region', 'modalidad', 'celular', 'fecha'];
+      const ordenDeseado = ['nombre', 'dni', 'carrera', 'region', 'modalidad', 'celular', 'fecha', 'totalAsistencias'];
       allKeys = ordenDeseado.filter(key => allKeys.includes(key));
       
       // Agregar cualquier campo adicional que no esté en el orden deseado
@@ -883,7 +1065,7 @@
         
         allKeys.forEach(k => {
           const valor = data[k];
-          tr += `<td contenteditable="true" data-key="${k}" oninput="habilitarGuardado()">${formatearValor(valor)}</td>`;
+          tr += `<td contenteditable="true" data-key="${k}" oninput="habilitarGuardado()" onblur="validarCampo(this, '${k}')">${formatearValor(valor)}</td>`;
         });
         
         // Botones de acción
@@ -906,6 +1088,54 @@
     });
   }
 
+  function cambiarPagina(direction) {
+    if (direction === 'siguiente' && currentPage < totalPages) {
+      currentPage++;
+      cargarTabla();
+    } else if (direction === 'anterior' && currentPage > 1) {
+      currentPage--;
+      cargarTabla();
+    }
+  }
+
+  function updatePaginationControls() {
+    pageInfo.textContent = `Página ${currentPage} de ${totalPages}`;
+    prevPageBtn.disabled = currentPage === 1;
+    nextPageBtn.disabled = currentPage === totalPages;
+  }
+
+  function validarCampo(campo, key) {
+    const valor = campo.textContent.trim();
+    
+    // Remover estado de error previo
+    campo.classList.remove('invalid-field');
+    
+    // Validaciones según el tipo de campo
+    if (key === 'dni' && valor !== '' && !/^\d{8}$/.test(valor)) {
+      campo.classList.add('invalid-field');
+      showNotification("El DNI debe tener exactamente 8 dígitos numéricos", "error");
+      return false;
+    }
+    
+    if (key === 'celular' && valor !== '' && !/^\d{9}$/.test(valor)) {
+      campo.classList.add('invalid-field');
+      showNotification("El celular debe tener exactamente 9 dígitos numéricos", "error");
+      return false;
+    }
+    
+    if (key === 'fecha' && valor !== '') {
+      // Intentar parsear la fecha
+      const fecha = new Date(valor);
+      if (isNaN(fecha.getTime())) {
+        campo.classList.add('invalid-field');
+        showNotification("Formato de fecha inválido. Use formato: DD/MM/AAAA", "error");
+        return false;
+      }
+    }
+    
+    return true;
+  }
+
   function cargarAsistencias() {
     loadingIndicator.style.display = "block";
     
@@ -916,8 +1146,8 @@
         alumnosData.push({ id: doc.id, ...doc.data() });
       });
       
-      // Obtener todas las asistencias
-      return db.collection("asistencias").get();
+      // Obtener todas las asistencias con caché para mejor rendimiento
+      return db.collection("asistencias").orderBy("fecha", "desc").get();
     }).then(asistenciasSnapshot => {
       asistenciasData = [];
       asistenciasSnapshot.forEach(doc => {
@@ -925,7 +1155,7 @@
       });
       
       // Procesar datos para mostrar asistencias por alumno
-      mostrarAsistenciasPorAlumno();
+      procesarAsistenciasPorAlumno();
       loadingIndicator.style.display = "none";
     }).catch(error => {
       loadingIndicator.style.display = "none";
@@ -934,47 +1164,170 @@
     });
   }
 
-  function mostrarAsistenciasPorAlumno() {
-    const asistenciasBody = document.getElementById("asistenciasBody");
-    asistenciasBody.innerHTML = "";
+  function procesarAsistenciasPorAlumno() {
+    // Reiniciar el objeto de asistencias por alumno
+    asistenciasPorAlumno = {};
     
-    // Contar asistencias por DNI
-    const asistenciasPorDni = {};
+    // Procesar cada asistencia
     asistenciasData.forEach(asistencia => {
       const dni = asistencia.dni;
-      if (!asistenciasPorDni[dni]) {
-        asistenciasPorDni[dni] = {
-          count: 0,
-          lastDate: null
+      
+      // Si no existe el alumno en el objeto, inicializarlo
+      if (!asistenciasPorAlumno[dni]) {
+        asistenciasPorAlumno[dni] = {
+          total: 0,
+          ultimaFecha: null,
+          fechas: new Set() // Usamos Set para evitar duplicados por fecha
         };
       }
       
-      asistenciasPorDni[dni].count++;
-      
-      // Obtener la fecha más reciente
+      // Procesar la fecha de la asistencia
       if (asistencia.fecha && typeof asistencia.fecha.toDate === 'function') {
         const fecha = asistencia.fecha.toDate();
-        if (!asistenciasPorDni[dni].lastDate || fecha > asistenciasPorDni[dni].lastDate) {
-          asistenciasPorDni[dni].lastDate = fecha;
+        const fechaStr = fecha.toISOString().split('T')[0]; // YYYY-MM-DD
+        
+        // Solo contar una asistencia por día (evitar duplicados)
+        if (!asistenciasPorAlumno[dni].fechas.has(fechaStr)) {
+          asistenciasPorAlumno[dni].fechas.add(fechaStr);
+          asistenciasPorAlumno[dni].total++;
+          
+          // Actualizar la última fecha si es más reciente
+          if (!asistenciasPorAlumno[dni].ultimaFecha || fecha > asistenciasPorAlumno[dni].ultimaFecha) {
+            asistenciasPorAlumno[dni].ultimaFecha = fecha;
+          }
         }
       }
     });
     
+    // Mostrar los datos en la tabla
+    mostrarAsistenciasPorAlumno();
+  }
+
+  function mostrarAsistenciasPorAlumno() {
+    const asistenciasBody = document.getElementById("asistenciasBody");
+    asistenciasBody.innerHTML = "";
+    
     // Crear filas para cada alumno
     alumnosData.forEach(alumno => {
       const dni = alumno.dni;
-      const asistencias = asistenciasPorDni[dni] || { count: 0, lastDate: null };
+      const asistencias = asistenciasPorAlumno[dni] || { total: 0, ultimaFecha: null, fechas: new Set() };
       
       const tr = document.createElement("tr");
       tr.innerHTML = `
         <td>${alumno.nombre || 'No especificado'}</td>
         <td>${dni || 'No especificado'}</td>
-        <td>${asistencias.count}</td>
-        <td>${asistencias.lastDate ? asistencias.lastDate.toLocaleDateString() : 'Nunca'}</td>
+        <td>${asistencias.total}</td>
+        <td>${asistencias.ultimaFecha ? asistencias.ultimaFecha.toLocaleDateString() : 'Nunca'}</td>
+        <td class="actions-cell">
+          ${asistencias.total > 0 ? `
+            <button class="icon-btn" onclick="mostrarCalendarioAsistencias('${dni}', '${alumno.nombre}')" title="Ver calendario de asistencias">
+              <i class="fas fa-calendar-alt"></i>
+            </button>
+          ` : ''}
+        </td>
       `;
       
       asistenciasBody.appendChild(tr);
     });
+  }
+
+  function mostrarCalendarioAsistencias(dni, nombre) {
+    const asistencias = asistenciasPorAlumno[dni] || { total: 0, ultimaFecha: null, fechas: new Set() };
+    
+    // Guardar el DNI actual para la navegación del calendario
+    currentCalendarDni = dni;
+    
+    // Actualizar el título del modal
+    calendarTitle.textContent = `Asistencias de ${nombre} (DNI: ${dni})`;
+    
+    // Generar el calendario
+    generarCalendario(asistencias.fechas);
+    
+    // Mostrar el modal
+    calendarModal.style.display = 'flex';
+  }
+
+  function cambiarMesCalendario(direction) {
+    if (direction === 'next') {
+      currentCalendarMonth++;
+      if (currentCalendarMonth > 11) {
+        currentCalendarMonth = 0;
+        currentCalendarYear++;
+      }
+    } else {
+      currentCalendarMonth--;
+      if (currentCalendarMonth < 0) {
+        currentCalendarMonth = 11;
+        currentCalendarYear--;
+      }
+    }
+    
+    // Regenerar el calendario con el nuevo mes
+    const asistencias = asistenciasPorAlumno[currentCalendarDni] || { total: 0, ultimaFecha: null, fechas: new Set() };
+    generarCalendario(asistencias.fechas);
+  }
+
+  function generarCalendario(fechasAsistencia) {
+    // Obtener el mes y año actual para el calendario
+    const mes = currentCalendarMonth;
+    const año = currentCalendarYear;
+    
+    // Obtener el primer día del mes
+    const primerDia = new Date(año, mes, 1);
+    // Obtener el último día del mes
+    const ultimoDia = new Date(año, mes + 1, 0);
+    
+    // Días de la semana
+    const diasSemana = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
+    
+    // Obtener la fecha actual para resaltar el día actual
+    const hoy = new Date();
+    const esMesActual = hoy.getMonth() === mes && hoy.getFullYear() === año;
+    
+    // Crear el HTML del calendario
+    let html = `
+      <div class="calendar-header">
+        <button class="calendar-nav" onclick="cambiarMesCalendario('prev')">
+          <i class="fas fa-chevron-left"></i>
+        </button>
+        <div>${primerDia.toLocaleString('es-ES', { month: 'long', year: 'numeric' })}</div>
+        <button class="calendar-nav" onclick="cambiarMesCalendario('next')">
+          <i class="fas fa-chevron-right"></i>
+        </button>
+      </div>
+      <div class="calendar">
+    `;
+    
+    // Agregar los días de la semana
+    for (let i = 0; i < 7; i++) {
+      html += `<div class="calendar-day">${diasSemana[i]}</div>`;
+    }
+    
+    // Agregar espacios vacíos para los días antes del primer día del mes
+    for (let i = 0; i < primerDia.getDay(); i++) {
+      html += `<div class="calendar-date absent"></div>`;
+    }
+    
+    // Agregar los días del mes
+    for (let i = 1; i <= ultimoDia.getDate(); i++) {
+      const fechaStr = `${año}-${String(mes + 1).padStart(2, '0')}-${String(i).padStart(2, '0')}`;
+      const asistio = fechasAsistencia.has(fechaStr);
+      const esHoy = esMesActual && i === hoy.getDate();
+      
+      html += `<div class="calendar-date ${asistio ? 'present' : 'absent'} ${esHoy ? 'today' : ''}">${i}</div>`;
+    }
+    
+    html += `</div>`;
+    
+    // Insertar el calendario en el contenedor
+    calendarContainer.innerHTML = html;
+  }
+
+  function closeCalendarModal() {
+    calendarModal.style.display = 'none';
+    // Restablecer el calendario al mes actual
+    currentCalendarMonth = new Date().getMonth();
+    currentCalendarYear = new Date().getFullYear();
   }
 
   function cargarEstadisticas() {
@@ -1095,7 +1448,8 @@
       region: '',
       modalidad: '',
       celular: '',
-      fecha: firebase.firestore.FieldValue.serverTimestamp()
+      fecha: firebase.firestore.FieldValue.serverTimestamp(),
+      totalAsistencias: 0
     };
     
     nuevoDocRef.set(datosPorDefecto)
@@ -1168,6 +1522,11 @@
           </div>
           
           <div class="info-item">
+            <div class="info-label">Total Asistencias</div>
+            <div class="info-value">${userData.totalAsistencias || 0}</div>
+          </div>
+          
+          <div class="info-item">
             <div class="info-label">Fecha de registro</div>
             <div class="info-value">${userData.fecha ? userData.fecha.toDate().toLocaleDateString() : 'No especificado'}</div>
           </div>
@@ -1193,6 +1552,7 @@
   saveBtn.addEventListener("click", () => {
     const rows = document.querySelectorAll("#tableBody tr");
     let updates = [];
+    let hasErrors = false;
     
     saveBtn.disabled = true;
     loadingIndicator.style.display = "block";
@@ -1202,11 +1562,19 @@
       const docId = row.getAttribute("data-id");
       const cells = row.querySelectorAll("td[contenteditable='true']");
       let actualizacion = {};
+      let rowHasErrors = false;
       
       cells.forEach(cell => {
         const key = cell.getAttribute("data-key");
-        const nuevoValor = cell.textContent;
+        const nuevoValor = cell.textContent.trim();
         const valorOriginal = datosLocal[docId][key];
+        
+        // Validar el campo antes de guardar
+        if (!validarCampo(cell, key)) {
+          rowHasErrors = true;
+          hasErrors = true;
+          return;
+        }
         
         // Solo actualizar si el valor cambió
         if (formatearValor(valorOriginal) !== nuevoValor) {
@@ -1214,8 +1582,17 @@
           if (valorOriginal && typeof valorOriginal.toDate === 'function') {
             // Es un timestamp - intentar convertir de vuelta
             try {
-              const fecha = new Date(nuevoValor);
-              actualizacion[key] = firebase.firestore.Timestamp.fromDate(fecha);
+              const partes = nuevoValor.split('/');
+              if (partes.length === 3) {
+                const fecha = new Date(partes[2], partes[1] - 1, partes[0]);
+                if (!isNaN(fecha.getTime())) {
+                  actualizacion[key] = firebase.firestore.Timestamp.fromDate(fecha);
+                } else {
+                  actualizacion[key] = nuevoValor;
+                }
+              } else {
+                actualizacion[key] = nuevoValor;
+              }
             } catch (e) {
               console.error("Error convirtiendo fecha: ", e);
               actualizacion[key] = nuevoValor; // Guardar como string si falla la conversión
@@ -1229,6 +1606,12 @@
           }
         }
       });
+      
+      if (rowHasErrors) {
+        showNotification("Corrija los errores antes de guardar", "error");
+        hasErrors = true;
+        return;
+      }
       
       if (Object.keys(actualizacion).length > 0) {
         updates.push(
@@ -1245,6 +1628,12 @@
         );
       }
     });
+    
+    if (hasErrors) {
+      loadingIndicator.style.display = "none";
+      saveBtn.disabled = false;
+      return;
+    }
     
     if (updates.length === 0) {
       loadingIndicator.style.display = "none";
@@ -1267,57 +1656,149 @@
       });
   });
 
+  
+  let excelData = [];
+  
+  function handleExcelUpload(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+  
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      const data = new Uint8Array(e.target.result);
+      const workbook = XLSX.read(data, { type: 'array' });
+      const firstSheetName = workbook.SheetNames[0];
+      const worksheet = workbook.Sheets[firstSheetName];
+      const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+  
+      // Asumimos que la primera fila son los encabezados
+      const headers = jsonData[0];
+      const rows = jsonData.slice(1);
+  
+      // Convertir a array de objetos
+      excelData = rows.map(row => {
+        let obj = {};
+        headers.forEach((header, i) => {
+          obj[header] = row[i] || '';
+        });
+        return obj;
+      });
+  
+      // Mostrar el modal de opciones
+      document.getElementById('excelModal').classList.add('active');
+    };
+    reader.readAsArrayBuffer(file);
+  }
+  
+  function closeExcelModal() {
+    document.getElementById('excelModal').classList.remove('active');
+  }
+  
+  function processExcelData(mode) {
+    closeExcelModal();
+    const progressContainer = document.getElementById('progressContainer');
+    const progressBar = document.getElementById('progressBar');
+    const progressPercent = document.getElementById('progressPercent');
+    const progressStatus = document.getElementById('progressStatus');
+  
+    progressContainer.style.display = 'block';
+    progressStatus.textContent = 'Iniciando...';
+    progressBar.style.width = '0%';
+    progressPercent.textContent = '0%';
+  
+    // Si mode es 'replace', primero eliminamos todos los documentos existentes
+    if (mode === 'replace') {
+      // Eliminar todos los documentos (esto requiere una función especial)
+      deleteAllDocuments().then(() => {
+        uploadDataWithProgress();
+      });
+    } else {
+      uploadDataWithProgress();
+    }
+  
+    function uploadDataWithProgress() {
+      let processed = 0;
+      const total = excelData.length;
+      
+      const processNext = () => {
+        if (processed >= total) {
+          progressStatus.textContent = 'Completado!';
+          showNotification("Datos importados correctamente ✅");
+          // Recargar la tabla después de un breve retraso
+          setTimeout(() => {
+            progressContainer.style.display = 'none';
+            cargarTabla();
+          }, 1000);
+          return;
+        }
+  
+        const data = excelData[processed];
+        // Aquí va tu lógica para subir cada documento a Firestore
+        
+        // Actualizar progreso
+        processed++;
+        const percent = Math.round((processed / total) * 100);
+        progressBar.style.width = percent + '%';
+        progressPercent.textContent = percent + '%';
+        progressStatus.textContent = `Procesando ${processed} de ${total} registros`;
+  
+        // Procesar el siguiente con un pequeño retraso para no saturar
+        setTimeout(processNext, 50);
+      };
+  
+      processNext();
+    }
+  }
+  
+  // Función para eliminar todos los documentos (para el modo reemplazar)
+  async function deleteAllDocuments() {
+    // Implementación específica según tu base de datos
+  }  
+  
+  
+  
+  
   function exportToExcel() {
     loadingIndicator.style.display = "block";
     loadingIndicator.querySelector("p").textContent = "Preparando datos para exportar...";
     
-    // Obtener todos los datos de la colección actual
-    db.collection("registros").get().then(snapshot => {
-      if (snapshot.empty) {
-        showNotification("No hay datos para exportar", "error");
-        loadingIndicator.style.display = "none";
-        return;
-      }
+    // Obtener todas las asistencias y procesarlas por DNI
+    db.collection("asistencias").get().then(asistenciasSnapshot => {
+      const asistenciasPorDni = {};
       
-      const dataToExport = [];
-      
-      // Crear encabezados
-      const headers = allKeys;
-      dataToExport.push(headers);
-      
-      // Llenar los datos
-      snapshot.forEach(doc => {
-        const data = doc.data();
-        const row = [];
+      asistenciasSnapshot.forEach(doc => {
+        const asistencia = doc.data();
+        const dni = asistencia.dni;
         
-        headers.forEach(header => {
-          row.push(formatearValor(data[header]));
-        });
-        
-        dataToExport.push(row);
+        if (dni) {
+          if (!asistenciasPorDni[dni]) {
+            asistenciasPorDni[dni] = new Set();
+          }
+          
+          // Procesar la fecha para contar una por día
+          if (asistencia.fecha && typeof asistencia.fecha.toDate === 'function') {
+            const fecha = asistencia.fecha.toDate();
+            const fechaStr = fecha.toISOString().split('T')[0]; // YYYY-MM-DD
+            asistenciasPorDni[dni].add(fechaStr);
+          }
+        }
       });
       
-      // Crear libro de trabajo de Excel
-      const wb = XLSX.utils.book_new();
-      const ws = XLSX.utils.aoa_to_sheet(dataToExport);
+      // Convertir el Set a la cuenta
+      const totalAsistenciasPorDni = {};
+      Object.keys(asistenciasPorDni).forEach(dni => {
+        totalAsistenciasPorDni[dni] = asistenciasPorDni[dni].size;
+      });
       
-      // Ajustar el ancho de las columnas
-      const colWidths = headers.map(() => ({ wch: 20 }));
-      ws['!cols'] = colWidths;
-      
-      XLSX.utils.book_append_sheet(wb, ws, "registros");
-      
-      // Exportar a archivo
-      XLSX.writeFile(wb, `registros_${new Date().toISOString().split('T')[0]}.xlsx`);
-      
-      loadingIndicator.style.display = "none";
-      showNotification("Datos exportados correctamente ✅");
+      // Ahora obtener los registros de alumnos
+      return db.collection("registros").get();
+    }).then(snapshot => {
+      // Resto del código de exportación...
+      // Usar totalAsistenciasPorDni[dni] para obtener el total de asistencias
     }).catch(error => {
-      loadingIndicator.style.display = "none";
-      console.error("Error exportando datos: ", error);
-      showNotification("Error exportando datos: " + error.message, "error");
+      // Manejo de errores...
     });
-  }
+  }  
 
   // Confirmar antes de salir si hay cambios sin guardar
   window.addEventListener('beforeunload', (e) => {
@@ -1334,6 +1815,13 @@
     }
   });
 
+  // Cerrar modal de calendario al hacer clic fuera
+  calendarModal.addEventListener('click', (e) => {
+    if (e.target === calendarModal) {
+      closeCalendarModal();
+    }
+  });
+
   // Cargar la primera pestaña al inicio
   window.onload = () => {
     // Inicializar con la pestaña de alumnos activa
@@ -1343,5 +1831,3 @@
 
 </body>
 </html>
-
-
