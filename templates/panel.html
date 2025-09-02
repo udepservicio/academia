@@ -1,512 +1,1111 @@
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Perfil del Alumno</title>
-  <link rel="icon" href="/static/logo.png" type="image/png" />
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet" />
-  <style>
-    * {
-      box-sizing: border-box;
-    }
-    body {
-      margin: 0;
-      padding: 40px 15px;
-      font-family: 'Poppins', sans-serif;
-      background: url("https://img.freepik.com/vector-premium/patron-fisuras-panal-hexagonal-blanco-negro-fondo-miel-mosaico-celular_434359-116.jpg?semt=ais_hybrid&w=740") repeat top left fixed;
-      background-size: auto;
-      display: flex;
-      justify-content: center;
-      animation: fadeIn 1.2s ease-in-out;
-    }
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(20px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-    @keyframes slideUp {
-      from { transform: translateY(40px); opacity: 0; }
-      to { transform: translateY(0); opacity: 1; }
-    }
-    .container {
-      width: 100%;
-      max-width: 1200px;
-      backdrop-filter: blur(10px);
-      background-color: rgba(255, 255, 255, 0.07);
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      border-radius: 25px;
-      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
-      padding: 30px;
-    }
-
-    .btn-eliminar {
-      margin: 40px auto 0;
-      display: block;
-      padding: 12px 30px;
-      background-color: #ff3b3b;
-      color: white;
-      font-weight: bold;
-      border: none;
-      border-radius: 12px;
-      box-shadow: 2px 2px 6px rgba(0,0,0,0.3);
-      cursor: pointer;
-      font-size: 16px;
-      transition: all 0.3s ease;
-    }
-    
-    .btn-eliminar:hover {
-      background-color: #e10000;
-      transform: scale(1.05);
-    }
-
-
-
-
-
-
-
-    .btn-volver {
-      position: fixed;
-      top: 16px;
-      left: 16px;
-      width: 40px;
-      height: 40px;
-      z-index: 1000;
-      border-radius: 50%;
-      box-shadow: 0 4px 6px rgba(0,0,0,0.3);
-      background-color: white;
-      padding: 4px;
-      transition: transform 0.2s ease;
-    }
-    
-    .btn-volver img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      border-radius: 50%;
-    }
-    
-    .btn-volver:hover {
-      transform: scale(1.1);
-    }
-
-
-
-
-
-    .perfil {
-      text-align: center;
-      margin-bottom: 30px;
-    }
-
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard - Gestión de Asistencias</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+  :root {
+    --primary: #1E3A5F;
+    --secondary: #4A6FA5;
+    --accent: #28a745;
+    --danger: #dc3545;
+    --warning: #ffc107;
+    --light: #f8f9fa;
+    --dark: #343a40;
+    --gray: #6c757d;
+    --border: #dee2e6;
+    --background: #f5f7fa;
+  }
   
-    .perfil img {
-      width: 130px;
-      height: 130px;
-      border-radius: 50%;
-      object-fit: cover;
-      border: 3px solid #0a0a0a;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+  
+  body {
+    font-family: 'Poppins', sans-serif;
+    background-color: var(--background);
+    color: #333;
+    line-height: 1.6;
+    padding: 0;
+    margin: 0;
+    font-size: 0.9rem;
+  }
+  
+  .container {
+    display: grid;
+    grid-template-columns: 220px 1fr;
+    min-height: 100vh;
+  }
+  
+  /* Sidebar */
+  .sidebar {
+    background: var(--primary);
+    color: white;
+    padding: 20px 0;
+    box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+  }
+  
+  .logo {
+    padding: 0 20px 20px;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    margin-bottom: 20px;
+  }
+  
+  .logo h1 {
+    font-size: 1.3rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  
+  .logo i {
+    font-size: 1.5rem;
+  }
+  
+  .tabs {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    padding: 0 10px;
+  }
+  
+  .tab-btn {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 12px;
+    background: transparent;
+    border: none;
+    border-radius: 6px;
+    color: rgba(255,255,255,0.8);
+    cursor: pointer;
+    transition: all 0.3s;
+    text-align: left;
+    font-size: 0.85rem;
+  }
+  
+  .tab-btn:hover {
+    background: rgba(255,255,255,0.1);
+    color: white;
+  }
+  
+  .tab-btn.active {
+    background: var(--secondary);
+    color: white;
+  }
+  
+  .tab-btn i {
+    width: 18px;
+    text-align: center;
+    font-size: 0.9rem;
+  }
+  
+  /* Main Content */
+  .main-content {
+    padding: 15px;
+    overflow: auto;
+  }
+  
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--border);
+  }
+  
+  .header h2 {
+    color: var(--primary);
+    font-weight: 600;
+    font-size: 1.3rem;
+  }
+  
+  .live-indicator {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.8rem;
+    color: var(--danger);
+    font-weight: 500;
+  }
+  
+  .live-dot {
+    width: 10px;
+    height: 10px;
+    background-color: var(--danger);
+    border-radius: 50%;
+    animation: pulse 1.5s infinite;
+  }
+  
+  @keyframes pulse {
+    0% {
+      transform: scale(0.95);
+      box-shadow: 0 0 0 0 rgba(220, 53, 69, 0.7);
     }
-    .perfil h2 {
-      margin-top: 14px;
-      font-size: 22px;
-      color: #000000;
-      font-weight: 700;
-      text-shadow: 0 1px 3px rgba(0,0,0,0.5);
+    70% {
+      transform: scale(1);
+      box-shadow: 0 0 0 6px rgba(220, 53, 69, 0);
     }
-    .grid {
-      display: flex;
+    100% {
+      transform: scale(0.95);
+      box-shadow: 0 0 0 0 rgba(220, 53, 69, 0);
+    }
+  }
+  
+  /* Actions */
+  .actions {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 15px;
+    flex-wrap: wrap;
+  }
+  
+  .btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 12px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: all 0.3s;
+    font-size: 0.8rem;
+  }
+  
+  .btn-primary {
+    background: var(--primary);
+    color: white;
+  }
+  
+  .btn-primary:hover {
+    background: #2c5282;
+  }
+  
+  .btn-success {
+    background: var(--accent);
+    color: white;
+  }
+  
+  .btn-success:hover {
+    background: #218838;
+  }
+  
+  .btn-info {
+    background: #17a2b8;
+    color: white;
+  }
+  
+  .btn-info:hover {
+    background: #138496;
+  }
+  
+  .btn-danger {
+    background: var(--danger);
+    color: white;
+  }
+  
+  .btn-danger:hover {
+    background: #bd2130;
+  }
+  
+  /* Table */
+  .table-container {
+    background: white;
+    border-radius: 6px;
+    box-shadow: 0 1px 6px rgba(0,0,0,0.05);
+    overflow: auto;
+    margin-bottom: 15px;
+  }
+  
+  table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  
+  th, td {
+    padding: 8px 10px;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+    font-size: 0.8rem;
+    height: 32px;
+  }
+  
+  th {
+    background-color: #f8f9fa;
+    color: var(--dark);
+    font-weight: 600;
+    position: sticky;
+    top: 0;
+    box-shadow: 0 1px 0 var(--border);
+    white-space: nowrap;
+  }
+  
+  tr:last-child td {
+    border-bottom: none;
+  }
+  
+  tr:hover {
+    background-color: #f8f9fa;
+  }
+  
+  td[contenteditable="true"] {
+    background: #fff;
+    outline: 1px solid var(--primary);
+    border-radius: 3px;
+    padding: 6px 8px;
+  }
+  
+  .actions-cell {
+    display: flex;
+    gap: 6px;
+    white-space: nowrap;
+  }
+  
+  .icon-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--gray);
+    transition: color 0.3s;
+    font-size: 0.9rem;
+    padding: 3px;
+    border-radius: 3px;
+  }
+  
+  .icon-btn:hover {
+    color: var(--primary);
+    background: rgba(0,0,0,0.05);
+  }
+  
+  .delete-btn:hover {
+    color: var(--danger);
+  }
+  
+  /* User Detail Modal */
+  .modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s;
+  }
+  
+  .modal-overlay.active {
+    opacity: 1;
+    pointer-events: all;
+  }
+  
+  .modal {
+    background: white;
+    border-radius: 6px;
+    width: 90%;
+    max-width: 700px;
+    max-height: 90vh;
+    overflow: auto;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+  }
+  
+  .modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px;
+    border-bottom: 1px solid var(--border);
+  }
+  
+  .modal-header h3 {
+    color: var(--primary);
+    margin: 0;
+    font-size: 1.1rem;
+  }
+  
+  .close-btn {
+    background: none;
+    border: none;
+    font-size: 1.3rem;
+    cursor: pointer;
+    color: var(--gray);
+  }
+  
+  .modal-body {
+    padding: 15px;
+  }
+  
+  .user-info {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 12px;
+    margin-bottom: 15px;
+  }
+  
+  .info-item {
+    margin-bottom: 8px;
+  }
+  
+  .info-label {
+    font-weight: 600;
+    color: var(--dark);
+    margin-bottom: 3px;
+    font-size: 0.8rem;
+  }
+  
+  .info-value {
+    color: var(--gray);
+    font-size: 0.85rem;
+  }
+  
+  .user-courses {
+    margin-top: 15px;
+  }
+  
+  .user-courses h4 {
+    margin-bottom: 10px;
+    color: var(--primary);
+    font-size: 0.95rem;
+  }
+  
+  .course-card {
+    background: #f8f9fa;
+    border-radius: 5px;
+    padding: 12px;
+    margin-bottom: 12px;
+  }
+  
+  .course-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 8px;
+  }
+  
+  .course-title {
+    font-weight: 600;
+    color: var(--primary);
+    font-size: 0.85rem;
+  }
+  
+  .course-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin-top: 8px;
+  }
+  
+  .stat {
+    text-align: center;
+    padding: 8px;
+    background: white;
+    border-radius: 5px;
+  }
+  
+  .stat-value {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--primary);
+  }
+  
+  .stat-label {
+    font-size: 0.7rem;
+    color: var(--gray);
+  }
+  
+  /* Notifications */
+  .notification {
+    position: fixed;
+    top: 15px;
+    right: 15px;
+    padding: 12px 15px;
+    border-radius: 5px;
+    color: white;
+    opacity: 0;
+    transition: opacity 0.5s;
+    z-index: 1000;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+    font-size: 0.85rem;
+  }
+  
+  .success {
+    background: var(--accent);
+  }
+  
+  .error {
+    background: var(--danger);
+  }
+  
+  /* Loading */
+  .loading {
+    display: none;
+    text-align: center;
+    margin: 15px;
+  }
+  
+  .spinner {
+    border: 2px solid #f3f3f3;
+    border-top: 2px solid var(--primary);
+    border-radius: 50%;
+    width: 25px;
+    height: 25px;
+    animation: spin 1s linear infinite;
+    margin: 0 auto;
+  }
+  
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+  
+  /* Responsive */
+  @media (max-width: 900px) {
+    .container {
+      grid-template-columns: 1fr;
+    }
+    
+    .sidebar {
+      display: none;
+    }
+    
+    .actions {
       flex-direction: column;
-      gap: 20px;
+      align-items: stretch;
     }
-    .card {
-      background-color: rgba(255, 255, 255, 0.55); 
-      border-radius: 20px;
-      padding: 20px;
-      color: #000;
-      text-shadow: 0 1px 2px rgba(0,0,0,0.3);
-      flex: 1;
+    
+    .btn {
+      justify-content: center;
     }
-    .card h3 {
-      font-size: 18px;
-      margin-bottom: 12px;
-      color: #000000;
-      border-bottom: 1px solid #ccc;
-      padding-bottom: 6px;
+    
+    .user-info {
+      grid-template-columns: 1fr;
     }
-    .simulacro {
-      display: flex;
-      justify-content: space-between;
-      margin: 6px 0;
-      font-size: 15px;
-      font-weight: 500;
+    
+    .course-stats {
+      grid-template-columns: 1fr;
     }
-    .bloqueado {
-      color: #023646;
-    }
-    .revancha-btn {
-      margin: 16px auto 0;
-      padding: 12px 28px;
-      background-color: rgba(223, 223, 223, 0.432);
-      border: 1.5px solid #ffffff;
-      font-weight: 600;
-      font-size: 15px;
-      border-radius: 25px;
-      box-shadow: 2px 2px 0px rgba(0,0,0,0.5);
-      color: #6100bb;
-      display: block;
-      cursor: pointer;
-      transition: all 0.2s ease;
-    }
+  }
+</style>
 
-    .revancha-btn:hover {
-      background-color: rgba(255,255,255,0.3);
-      transform: translateY(-2px);
-    }
-
-    .tema {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin: 6px 0;
-    }
-    .barra {
-      width: 60%;
-      background-color: rgba(255, 255, 255, 0.2);
-      border: 1px solid #fff;
-      border-radius: 20px;
-      height: 18px;
-      overflow: hidden;
-    }
-    .progreso {
-      height: 100%;
-      
-      border-radius: 20px;
-      text-align: right;
-      color: white;
-      font-size: 12px;
-      padding-right: 5px;
-      line-height: 18px;
-      font-weight: 600;
-      transition: width 1.5s ease, background-color 0.6s ease;
-    }
-    .tema span {
-      width: 35%;
-      font-size: 14px;
-      font-weight: 500;
-    }
-    .loader {
-      display: inline-block;
-      width: 16px; height: 16px;
-      border: 3px solid #ccc;
-      border-top: 3px solid #007BFF;
-      border-radius: 50%;
-      animation: spin 1s linear infinite;
-    }
-    @keyframes spin { to { transform: rotate(360deg); } }
-    #dniForm {
-      text-align: center;
-      margin: 0 auto 20px auto;
-    }
-    #dniInput {
-      padding: 10px;
-      border-radius: 10px;
-      border: 1px solid #aaa;
-      font-size: 16px;
-      width: 200px;
-    }
-    
-    
-    select, .btn-primary {
-      width: 100%;
-      margin-top: 15px;
-      padding: 10px;
-      border-radius: 10px;
-      border: 1px solid #ccc;
-      font-family: 'Poppins';
-    }
-
-    .btn-primary {
-      background: #01215c;
-      color: white;
-      font-weight: 600;
-      cursor: pointer;
-    }
-    
-    
-    #buscarBtn {
-      padding: 10px 18px;
-      margin-left: 8px;
-      font-size: 16px;
-      border-radius: 10px;
-      border: none;
-      background: #007BFF;
-      color: white;
-      font-weight: bold;
-      cursor: pointer;
-    }
-    @media (min-width: 768px) {
-      .grid {
-        flex-direction: row;
-      }
-    }
-  </style>
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+<!-- SheetJS (para exportar a Excel) -->
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 </head>
 <body>
 
+<div class="container">
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <div class="logo">
+      <h1><i class="fas fa-chalkboard-teacher"></i> Asistencias</h1>
+    </div>
+    
+    <div class="tabs">
+      <button class="tab-btn active" onclick="cambiarTab('asistencias')">
+        <i class="fas fa-clipboard-check"></i> Asistencias
+      </button>
+      <button class="tab-btn" onclick="cambiarTab('alumnos')">
+        <i class="fas fa-user-graduate"></i> Alumnos
+      </button>
+      <button class="tab-btn" onclick="cambiarTab('cursos')">
+        <i class="fas fa-book"></i> Cursos
+      </button>
+    </div>
+  </div>
   
-  <div class="container">
-    <a href="/" class="btn-volver" title="Volver al inicio">
-      <img src="https://play-lh.googleusercontent.com/RnyHBmPzgs7yVW7-bO_B0xjxtPC7KcVZcnwhyyGGG_6s65ko4W-cHIAqHEpCTUYeBr0" alt="Volver" />
-    </a>   
-    
-    <div class="perfil">
-      <img id="fotoPerfil" src="" alt="Foto del COAR" />
-      <h2>¡Hola <span id="nombreAlumno"></span>!</h2>
+  <!-- Main Content -->
+  <div class="main-content">
+    <div class="header">
+      <h2 id="tableTitle">Gestión de Asistencias</h2>
+      <div class="live-indicator">
+        <div class="live-dot"></div>
+        <span>En vivo</span>
+      </div>
     </div>
-    <div class="grid">
-      <div class="card">
-        <h3>Información</h3>
-        <p><strong>COAR:</strong> <span id="regionAlumno"></span></p>
-        <p><strong>Promedio:</strong> <span id="promedio"><span class="loader"></span></span>/20</p>
-        <p><strong>Probabilidad de Ingreso:</strong> <span id="probabilidadIngreso">--%</span></p>
-
-      </div>
-      <div class="card">
-        <h3>Mis Evaluaciones</h3>
-        <div class="simulacro">Simulacro 01: <span id="PC1" class="bloqueado">🔒</span></div>
-        <div class="simulacro">Simulacro 02: <span id="PC2" class="bloqueado">🔒</span></div>
-        <div class="simulacro">Simulacro 03: <span id="PC3" class="bloqueado">🔒</span></div>
-        <div class="simulacro">Simulacro 04: <span id="PC4" class="bloqueado">🔒</span></div>
-        <div class="simulacro">Simulacro 05: <span id="PC5" class="bloqueado">🔒</span></div>
-        
-        
-        
-        <div class="simulacro">Simulacro 06: <span id="PC6" class="bloqueado">🔒</span></div>
-        <div class="simulacro">Simulacro 07: <span id="PC7" class="bloqueado">🔒</span></div>
-        <div class="simulacro">Simulacro 08: <span id="PC8" class="bloqueado">🔒</span></div>
-        <div class="simulacro">Simulacro 09: <span id="PC9" class="bloqueado">🔒</span></div>        
-        
-        
-        
-        <button class="revancha-btn" onclick="mostrarMenuRevancha()">Revancha</button>
-        
-      </div>
-      <div class="card">
-        <h3>Dominio de Temas</h3>
-
-        <div class="tema"><span>Porcentajes</span><div class="barra"><div class="progreso" id="prog-algebra">0%</div></div></div>
-        <div class="tema"><span>Aritmética I</span><div class="barra"><div class="progreso" id="prog-aritmetica">0%</div></div></div>
-        <div class="tema"><span>Geometría</span><div class="barra"><div class="progreso" id="prog-geometria">0%</div></div></div>
-        <div class="tema"><span>Geometría II</span><div class="barra"><div class="progreso" id="prog-estadistica">0%</div></div></div>
-        <div class="tema"><span>Mates RC</span><div class="barra"><div class="progreso" id="prog-matesrc">0%</div></div></div>
-        
-        
-        <div class="tema"><span>Mates RC 2</span><div class="barra"><div class="progreso" id="prog-trigonometria">0%</div></div></div>
-        <div class="tema"><span>Transformaciones G. + Trigo...</span><div class="barra"><div class="progreso" id="prog-probabilidades">0%</div></div></div>
-        <div class="tema"><span>Funciones</span><div class="barra"><div class="progreso" id="prog-funciones">0%</div></div></div>
-        <div class="tema"><span>Hab. Lectoras</span><div class="barra"><div class="progreso" id="prog-lectoras">0%</div></div></div>
-        
-        
-        <button id="eliminarCuentaBtn" class="btn-eliminar">Eliminar cuenta</button> 
-
-      </div>
+    
+    <div class="actions">
+      <button class="btn btn-primary" onclick="agregarFila()">
+        <i class="fas fa-plus"></i> Agregar Fila
+      </button>
+      <button class="btn btn-success" id="saveBtn" disabled>
+        <i class="fas fa-save"></i> Guardar Cambios
+      </button>
+      <button class="btn btn-info" onclick="exportToExcel()">
+        <i class="fas fa-file-export"></i> Exportar a Excel
+      </button>
+    </div>
+    
+    <div class="table-container">
+      <table id="dataTable">
+        <thead id="tableHead"></thead>
+        <tbody id="tableBody"></tbody>
+      </table>
+    </div>
+    
+    <div class="loading" id="loadingIndicator">
+      <div class="spinner"></div>
+      <p>Cargando datos...</p>
     </div>
   </div>
-  <div id="transicion" style="display:none; justify-content: center; align-items: center; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.8); z-index: 9999;">
-    <div class="transicion-card" style="background: white; padding: 30px; border-radius: 15px; width: 300px; text-align: center; animation: slideUp 0.6s ease; position: relative;">
-      <button onclick="cerrarMenuRevancha()" style="position: absolute; top: 10px; right: 15px; background: transparent; border: none; font-size: 20px; font-weight: bold; cursor: pointer;">×</button>
-      <h3>¿Cuál de los exámenes deseas tener una revancha?</h3>
-      <select id="examen">
-        <option value="PC1">PC1</option>
-        <option value="PC2">PC2</option>
-        <option value="PC3">PC3</option>
+</div>
 
-        <option value="PC4">PC4</option>
-        <option value="PC5">PC5</option>
-        <option value="PC6">PC6</option>
-        <option value="PC7">PC7</option>
-        <option value="PC8">PC8</option>
-        <option value="PC9">PC9</option>        
-        
-        
-        
-      </select>
-      <button class="btn-primary" onclick="enviarRevancha()">Comenzar Revancha</button>
+<!-- Modal para detalles de usuario -->
+<div class="modal-overlay" id="userModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>Detalles del Alumno</h3>
+      <button class="close-btn" onclick="closeModal()">&times;</button>
+    </div>
+    <div class="modal-body" id="userModalBody">
+      <!-- Contenido dinámico -->
     </div>
   </div>
- 
+</div>
 
-  <script>
-    document.getElementById("nombreAlumno").textContent = localStorage.getItem("nombreAlumno");
-    document.getElementById("regionAlumno").textContent = localStorage.getItem("regionAlumno");  
+<div id="notification" class="notification"></div>
 
-    // Mostrar imagen según sexo
+<script>
+  // Configuración Firebase
+  const firebaseConfig = {
+    apiKey: "AIzaSyCohuXeXlI6z8R0RXEIWeL4atI9zkpj_i4",
+    authDomain: "academia-udep-43440.firebaseapp.com",
+    projectId: "academia-udep-43440",
+    storageBucket: "academia-udep-43440.firebasestorage.app",
+    messagingSenderId: "853553587165",
+    appId: "1:853553587165:web:d2fd928f520d51276e4c34"
+  };
+  
+  // Inicializar Firebase
+  try {
+    firebase.initializeApp(firebaseConfig);
+  } catch (error) {
+    console.error("Error inicializando Firebase: ", error);
+    showNotification("Error inicializando Firebase", "error");
+  }
+  
+  const db = firebase.firestore();
+  let coleccionActual = "asistencias";
+  let datosLocal = {};
+  let cambiosPendientes = false;
+  let allKeys = [];
+  let unsubscribe = null;
 
-    const sexo = localStorage.getItem("sexo");
-    const foto = document.getElementById("fotoPerfil");
+  // Referencias a elementos del DOM
+  const saveBtn = document.getElementById("saveBtn");
+  const loadingIndicator = document.getElementById("loadingIndicator");
+  const notificationElement = document.getElementById("notification");
+  const tableTitle = document.getElementById("tableTitle");
+  const userModal = document.getElementById("userModal");
+  const userModalBody = document.getElementById("userModalBody");
+
+  function showNotification(message, type = "success") {
+    notificationElement.textContent = message;
+    notificationElement.className = `notification ${type}`;
+    notificationElement.style.opacity = 1;
     
-    if (sexo === "mujer") {
-      //foto.src = "https://i.pinimg.com/736x/e3/fa/cb/e3facb5ce3cc8e7db69d9e14be81508c.jpg"; // Foto para mujeres
-      foto.src = "/static/mu1.jpg";
- 
-    } else {
-      foto.src = "https://i.pinimg.com/736x/c6/5b/4a/c65b4aa73ee5c8c9ec8bfb641b4175b2.jpg"; // Foto para hombres
-    }
+    setTimeout(() => {
+      notificationElement.style.opacity = 0;
+    }, 3000);
+  }
 
-
-
-
-    
-    function mostrarMenuRevancha() {
-      document.getElementById('transicion').style.display = 'flex';
-    }
-
-    function enviarRevancha() {
-      const examen = document.getElementById('examen').value;
-      const mensaje = encodeURIComponent(`¡Profesor! 🥳 Quiero dar una revancha del examen: ${examen}, por favor`);
-      const telefono = '51939476507';
-      const url = `https://api.whatsapp.com/send?phone=${telefono}&text=${mensaje}`;
-      window.open(url, '_blank');
-      document.getElementById('transicion').style.display = 'none';
-    }
-
-    function cerrarMenuRevancha() {
-      document.getElementById('transicion').style.display = 'none';
-    }
-
-    const cursos = ["PC1", "PC2", "PC3", "PC4", "PC5", "PC6", "PC7", "PC8", "PC9"];
-    const datosURL = "https://script.google.com/macros/s/AKfycbyNFssaqjICHFZz7skyiC8aeIZEUEVvdjAC1xuQmRVmVEo4rRxOI0hMiDU2e-eWxFUGPQ/exec?tipo=alumnos";
-
-    function buscarNotas() {
-      const dni = localStorage.getItem("dniAlumno");
-
-      const mapeo = {
-        PC1: 'prog-algebra',
-        
-        
-        PC2: 'prog-aritmetica',
-        PC3: 'prog-geometria',
-        PC4: 'prog-estadistica',
-        PC5: 'prog-matesrc',
-        PC6: 'prog-trigonometria',
-        PC7: 'prog-probabilidades',
-        PC8: 'prog-funciones',
-        PC9: 'prog-lectoras'
-      };      
-      
-      
-
-      cursos.forEach(curso => {
-        document.getElementById(curso).innerHTML = "<span class='loader'></span>";
-        const barra = document.getElementById(mapeo[curso]);
-        barra.style.width = '0%';
-        barra.textContent = '0%';
-        barra.style.background = '#ccc';
-      });
-
-      fetch(datosURL)
-        .then(res => res.json())
-        .then(data => {
-          const notas = data.filter(item => item.DNI == dni);
-          let suma = 0;
-          let cantidad = 0;
-
-          cursos.forEach(curso => {
-            const nota = notas.find(n => n.Curso === curso);
-            const valor = nota ? parseFloat(nota.Nota) : null;
-
-            if (valor !== null && !isNaN(valor)) {
-              document.getElementById(curso).textContent = valor;
-              suma += valor;
-              cantidad++;
-
-              const porcentaje = Math.round((valor / 20) * 100);
-              const barraID = mapeo[curso];
-              animarBarra(barraID, porcentaje);
-            } else {
-              document.getElementById(curso).textContent = "🔒";
-            }
-          });
-
-          // Mostrar el promedio
-          const promedio = cantidad > 0 ? (suma / cantidad).toFixed(2) : '--';
-          document.getElementById('promedio').textContent = promedio;
-
-          
-          
-          const probabilidad = cantidad > 0 ? (((suma - 0.84) / cantidad) / 20 * 100).toFixed(1) : '--';
-          document.getElementById('probabilidadIngreso').textContent = probabilidad + "%";
-
-
-
-
-          
-        })
-        .catch(err => {
-          cursos.forEach(curso => {
-            document.getElementById(curso).textContent = "🔒";
-          });
-          alert("Error al cargar los datos.");
-          console.error(err);
-        });
-    }
-
-
-    function obtenerGradiente(porcentaje) {
-      if (porcentaje < 50) {
-        return `linear-gradient(90deg, #f44336 ${porcentaje}%, #e0e0e0 ${porcentaje}%)`; // rojo
-      } else if (porcentaje < 75) {
-        return `linear-gradient(90deg, #ffc107 0%, #ffc107 ${porcentaje}%, #e0e0e0 ${porcentaje}%)`; // amarillo
-      } else if (porcentaje < 100) {
-        return `linear-gradient(90deg, #4caf50 0%, #4caf50 ${porcentaje}%, #e0e0e0 ${porcentaje}%)`; // verde
-      } else {
-        return `linear-gradient(135deg, #00eaff, #004aad)`; // 100% celeste a azul oscuro
+  function cambiarTab(tab) {
+    if (cambiosPendientes) {
+      if (!confirm("Tienes cambios sin guardar. ¿Estás seguro de que quieres cambiar de pestaña?")) {
+        return;
       }
     }
-
     
-    document.getElementById('eliminarCuentaBtn').addEventListener('click', function () {
-      const confirmar = confirm("¿Estás seguro de que deseas solicitar la eliminación de tu cuenta?");
-      if (confirmar) {
-        const mensaje = encodeURIComponent("Profesor, quiero eliminar mi cuenta");
-        const telefono = "51939476507";
-        const url = `https://api.whatsapp.com/send?phone=${telefono}&text=${mensaje}`;
-        window.open(url, '_blank');
+    coleccionActual = tab;
+    document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+    document.querySelector(`.tab-btn[onclick="cambiarTab('${tab}')"]`).classList.add("active");
+    
+    // Actualizar título
+    const titles = {
+      'asistencias': 'Gestión de Asistencias',
+      'alumnos': 'Gestión de Alumnos',
+      'cursos': 'Gestión de Cursos'
+    };
+    tableTitle.textContent = titles[tab] || 'Gestión de Datos';
+    
+    // Cargar datos de la nueva colección
+    cargarTabla();
+  }
+
+  function formatearValor(valor) {
+    if (valor === null || valor === undefined) return "";
+    
+    // Si es un timestamp de Firestore
+    if (valor && typeof valor.toDate === 'function') {
+      return valor.toDate().toLocaleString("es-ES");
+    }
+    
+    // Si es un objeto (pero no un timestamp)
+    if (typeof valor === 'object') {
+      return JSON.stringify(valor);
+    }
+    
+    return valor;
+  }
+
+  function cargarTabla() {
+    const head = document.getElementById("tableHead");
+    const body = document.getElementById("tableBody");
+    
+    head.innerHTML = "";
+    body.innerHTML = "";
+    datosLocal = {};
+    cambiosPendientes = false;
+    saveBtn.disabled = true;
+    
+    loadingIndicator.style.display = "block";
+
+    // Cancelar suscripción anterior si existe
+    if (unsubscribe) {
+      unsubscribe();
+    }
+
+    // Determinar qué colección cargar según la pestaña seleccionada
+    let collectionName = coleccionActual;
+    if (coleccionActual === 'alumnos') {
+      collectionName = 'registros'; // Usar la colección "registro" para la pestaña Alumnos
+    }
+
+    // Usar onSnapshot para sincronización en tiempo real
+    unsubscribe = db.collection(collectionName).onSnapshot(snapshot => {
+      loadingIndicator.style.display = "none";
+      
+      head.innerHTML = "";
+      body.innerHTML = "";
+      
+      if (snapshot.empty) {
+        head.innerHTML = "<tr><th colspan='3'>No hay datos en esta colección</th></tr>";
+        return;
+      }
+
+      // Obtener todas las claves únicas de todos los documentos
+      allKeys = new Set();
+      snapshot.forEach(doc => {
+        Object.keys(doc.data()).forEach(key => allKeys.add(key));
+      });
+      
+      // Convertir a array y asegurar que 'dni' esté primero si existe
+      allKeys = Array.from(allKeys);
+      if (allKeys.includes('dni')) {
+        allKeys = ['dni', ...allKeys.filter(key => key !== 'dni')];
+      }
+      
+      // Crear encabezados
+      let trHead = "<tr>";
+      allKeys.forEach(k => { 
+        trHead += `<th>${k}</th>`; 
+      });
+      
+      // Agregar columna de acciones
+      trHead += "<th>Acciones</th></tr>";
+      
+      head.innerHTML = trHead;
+
+      // Crear filas
+      snapshot.forEach(doc => {
+        const data = doc.data();
+        datosLocal[doc.id] = {...data}; // Guardar copia local
+        
+        let tr = `<tr data-id="${doc.id}">`;
+        
+        allKeys.forEach(k => {
+          const valor = data[k];
+          tr += `<td contenteditable="true" data-key="${k}" oninput="habilitarGuardado()">${formatearValor(valor)}</td>`;
+        });
+        
+        // Botones de acción
+        tr += `<td class="actions-cell">`;
+        
+        if (collectionName === 'registro') {
+          tr += `<button class="icon-btn" onclick="verDetallesAlumno('${doc.id}')" title="Ver detalles">
+                    <i class="fas fa-eye"></i>
+                 </button>`;
+        }
+        
+        tr += `<button class="icon-btn delete-btn" onclick="eliminarFila('${doc.id}', '${collectionName}')" title="Eliminar">
+                  <i class="fas fa-trash"></i>
+               </button>
+              </td>`;
+        
+        tr += "</tr>";
+        body.innerHTML += tr;
+      });
+    }, error => {
+      loadingIndicator.style.display = "none";
+      console.error("Error cargando datos: ", error);
+      showNotification("Error cargando datos: " + error.message, "error");
+    });
+  }
+
+  function habilitarGuardado() {
+    cambiosPendientes = true;
+    saveBtn.disabled = false;
+  }
+
+  function agregarFila() {
+    // Determinar en qué colección agregar
+    let collectionName = coleccionActual;
+    if (coleccionActual === 'alumnos') {
+      collectionName = 'registro';
+    }
+    
+    // Crear un nuevo documento con valores por defecto
+    const nuevoDocRef = db.collection(collectionName).doc();
+    const datosPorDefecto = {};
+    
+    // Establecer valores por defecto para campos conocidos
+    if (allKeys.includes('dni')) datosPorDefecto.dni = '';
+    if (allKeys.includes('fecha')) datosPorDefecto.fecha = firebase.firestore.FieldValue.serverTimestamp();
+    if (allKeys.includes('codigoDia')) datosPorDefecto.codigoDia = '';
+    if (allKeys.includes('nombre')) datosPorDefecto.nombre = '';
+    
+    nuevoDocRef.set(datosPorDefecto)
+      .then(() => {
+        showNotification("Nueva fila agregada");
+      })
+      .catch(error => {
+        console.error("Error agregando fila: ", error);
+        showNotification("Error agregando fila: " + error.message, "error");
+      });
+  }
+
+  function eliminarFila(docId, collectionName = null) {
+    if (!collectionName) {
+      collectionName = coleccionActual;
+      if (coleccionActual === 'alumnos') {
+        collectionName = 'registro';
+      }
+    }
+    
+    if (confirm("¿Estás seguro de que deseas eliminar esta fila?")) {
+      db.collection(collectionName).doc(docId).delete()
+        .then(() => {
+          showNotification("Fila eliminada correctamente");
+        })
+        .catch(error => {
+          console.error("Error eliminando fila: ", error);
+          showNotification("Error eliminando fila: " + error.message, "error");
+        });
+    }
+  }
+
+  function verDetallesAlumno(userId) {
+    loadingIndicator.style.display = "block";
+    
+    // Obtener datos del alumno desde la colección "registro"
+    db.collection('registro').doc(userId).get().then(userDoc => {
+      if (!userDoc.exists) {
+        showNotification("Alumno no encontrado", "error");
+        loadingIndicator.style.display = "none";
+        return;
+      }
+      
+      const userData = userDoc.data();
+      
+      // Obtener asistencias del alumno
+      db.collection('asistencias')
+        .where('dni', '==', userData.dni)
+        .get()
+        .then(asistenciasSnapshot => {
+          loadingIndicator.style.display = "none";
+          
+          let asistenciasHTML = '';
+          let totalAsistencias = 0;
+          
+          if (!asistenciasSnapshot.empty) {
+            totalAsistencias = asistenciasSnapshot.size;
+            
+            // Agrupar asistencias por curso
+            const asistenciasPorCurso = {};
+            
+            asistenciasSnapshot.forEach(doc => {
+              const data = doc.data();
+              const curso = data.curso || 'Sin curso asignado';
+              
+              if (!asistenciasPorCurso[curso]) {
+                asistenciasPorCurso[curso] = [];
+              }
+              
+              asistenciasPorCurso[curso].push(data);
+            });
+            
+            // Generar HTML para cada curso
+            for (const [curso, asistencias] of Object.entries(asistenciasPorCurso)) {
+              asistenciasHTML += `
+                <div class="course-card">
+                  <div class="course-header">
+                    <div class="course-title">${curso}</div>
+                    <div class="course-dates">${asistencias.length} asistencias</div>
+                  </div>
+                  
+                  <div class="course-stats">
+                    <div class="stat">
+                      <div class="stat-value">${asistencias.length}</div>
+                      <div class="stat-label">Total Asistencias</div>
+                    </div>
+                    <div class="stat">
+                      <div class="stat-value">${Math.round(asistencias.length / 30 * 100)}%</div>
+                      <div class="stat-label">Porcentaje</div>
+                    </div>
+                    <div class="stat">
+                      <div class="stat-value">${new Date(Math.max(...asistencias.map(a => a.fecha?.toDate?.() || new Date()))).toLocaleDateString()}</div>
+                      <div class="stat-label">Última asistencia</div>
+                    </div>
+                  </div>
+                  
+                  <div class="asistencias-list">
+                    <h5>Últimas asistencias:</h5>
+                    <ul>
+                      ${asistencias.slice(-5).map(a => `
+                        <li>${a.fecha ? a.fecha.toDate().toLocaleString() : 'Fecha no disponible'} - ${a.codigoDia || 'Sin código'}</li>
+                      `).join('')}
+                    </ul>
+                  </div>
+                </div>
+              `;
+            }
+          } else {
+            asistenciasHTML = '<p>El alumno no tiene asistencias registradas.</p>';
+          }
+          
+          // Construir el modal con la información del alumno
+          userModalBody.innerHTML = `
+            <div class="user-info">
+              <div class="info-item">
+                <div class="info-label">DNI</div>
+                <div class="info-value">${userData.dni || 'No especificado'}</div>
+              </div>
+              
+              <div class="info-item">
+                <div class="info-label">Nombre</div>
+                <div class="info-value">${userData.nombre || 'No especificado'}</div>
+              </div>
+              
+              <div class="info-item">
+                <div class="info-label">Email</div>
+                <div class="info-value">${userData.email || 'No especificado'}</div>
+              </div>
+              
+              <div class="info-item">
+                <div class="info-label">Teléfono</div>
+                <div class="info-value">${userData.telefono || 'No especificado'}</div>
+              </div>
+              
+              <div class="info-item">
+                <div class="info-label">Curso</div>
+                <div class="info-value">${userData.curso || 'No especificado'}</div>
+              </div>
+              
+              <div class="info-item">
+                <div class="info-label">Fecha de registro</div>
+                <div class="info-value">${userData.fechaRegistro ? userData.fechaRegistro.toDate().toLocaleDateString() : 'No especificado'}</div>
+              </div>
+            </div>
+            
+            <div class="user-courses">
+              <h4>Asistencias en cursos (${totalAsistencias} total)</h4>
+              ${asistenciasHTML}
+            </div>
+          `;
+          
+          // Mostrar el modal
+          userModal.classList.add('active');
+        })
+        .catch(error => {
+          loadingIndicator.style.display = "none";
+          console.error("Error obteniendo asistencias: ", error);
+          showNotification("Error obteniendo asistencias del alumno", "error");
+        });
+    })
+    .catch(error => {
+      loadingIndicator.style.display = "none";
+      console.error("Error obteniendo alumno: ", error);
+      showNotification("Error obteniendo datos del alumno", "error");
+    });
+  }
+
+  function closeModal() {
+    userModal.classList.remove('active');
+  }
+
+  // Guardar cambios en Firestore
+  saveBtn.addEventListener("click", () => {
+    const rows = document.querySelectorAll("#tableBody tr");
+    let updates = [];
+    
+    saveBtn.disabled = true;
+    loadingIndicator.style.display = "block";
+    loadingIndicator.querySelector("p").textContent = "Guardando cambios...";
+
+    // Determinar en qué colección guardar
+    let collectionName = coleccionActual;
+    if (coleccionActual === 'alumnos') {
+      collectionName = 'registro';
+    }
+
+    rows.forEach(row => {
+      const docId = row.getAttribute("data-id");
+      const cells = row.querySelectorAll("td[contenteditable='true']");
+      let actualizacion = {};
+      
+      cells.forEach(cell => {
+        const key = cell.getAttribute("data-key");
+        const nuevoValor = cell.textContent;
+        const valorOriginal = datosLocal[docId][key];
+        
+        // Solo actualizar si el valor cambió
+        if (formatearValor(valorOriginal) !== nuevoValor) {
+          // Intentar convertir valores si es necesario
+          if (valorOriginal && typeof valorOriginal.toDate === 'function') {
+            // Es un timestamp - intentar convertir de vuelta
+            try {
+              const fecha = new Date(nuevoValor);
+              actualizacion[key] = firebase.firestore.Timestamp.fromDate(fecha);
+            } catch (e) {
+              console.error("Error convirtiendo fecha: ", e);
+              actualizacion[key] = nuevoValor; // Guardar como string si falla la conversión
+            }
+          } else if (typeof valorOriginal === 'number') {
+            actualizacion[key] = Number(nuevoValor) || nuevoValor;
+          } else if (typeof valorOriginal === 'boolean') {
+            actualizacion[key] = (nuevoValor.toLowerCase() === 'true');
+          } else {
+            actualizacion[key] = nuevoValor;
+          }
+        }
+      });
+      
+      if (Object.keys(actualizacion).length > 0) {
+        updates.push(
+          db.collection(collectionName).doc(docId).update(actualizacion)
+            .then(() => {
+              console.log("Documento actualizado: ", docId);
+              // Actualizar datos locales con los nuevos valores
+              datosLocal[docId] = {...datosLocal[docId], ...actualizacion};
+            })
+            .catch(error => {
+              console.error("Error actualizando documento ", docId, ": ", error);
+              throw error;
+            })
+        );
       }
     });
     
-
-
-
-
-    function animarBarra(id, porcentajeFinal) {
-      const barra = document.getElementById(id);
-      let valor = 0;
-
-      const intervalo = setInterval(() => {
-        if (valor >= porcentajeFinal) {
-          clearInterval(intervalo);
-        } else {
-          valor++;
-          barra.style.width = valor + "%";
-          barra.textContent = valor + "%";
-          barra.style.background = obtenerGradiente(valor);
-        }
-      }, 15);
+    if (updates.length === 0) {
+      loadingIndicator.style.display = "none";
+      showNotification("No hay cambios para guardar");
+      cambiosPendientes = false;
+      return;
     }
+    
+    Promise.all(updates)
+      .then(() => {
+        loadingIndicator.style.display = "none";
+        showNotification("Cambios guardados correctamente ✅");
+        cambiosPendientes = false;
+      })
+      .catch(error => {
+        loadingIndicator.style.display = "none";
+        console.error("Error guardando cambios: ", error);
+        showNotification("Error guardando cambios: " + error.message, "error");
+        saveBtn.disabled = false;
+      });
+  });
 
-    window.onload = () => {
-      buscarNotas();
-    };
-  </script>
+  function exportToExcel() {
+    loadingIndicator.style.display = "block";
+    loadingIndicator.querySelector("p").textContent = "Preparando datos para exportar...";
+    
+    // Determinar qué colección exportar
+    let collectionName = coleccionActual;
+    if (coleccionActual === 'alumnos') {
+      collectionName = 'registro';
+    }
+    
+    // Obtener todos los datos de la colección actual
+    db.collection(collectionName).get().then(snapshot => {
+      if (snapshot.empty) {
+        showNotification("No hay datos para exportar", "error");
+        loadingIndicator.style.display = "none";
+        return;
+      }
+      
+      const dataToExport = [];
+      
+      // Crear encabezados
+      const headers = allKeys;
+      dataToExport.push(headers);
+      
+      // Llenar los datos
+      snapshot.forEach(doc => {
+        const data = doc.data();
+        const row = [];
+        
+        headers.forEach(header => {
+          row.push(formatearValor(data[header]));
+        });
+        
+        dataToExport.push(row);
+      });
+      
+      // Crear libro de trabajo de Excel
+      const wb = XLSX.utils.book_new();
+      const ws = XLSX.utils.aoa_to_sheet(dataToExport);
+      
+      // Ajustar el ancho de las columnas
+      const colWidths = headers.map(() => ({ wch: 20 }));
+      ws['!cols'] = colWidths;
+      
+      XLSX.utils.book_append_sheet(wb, ws, collectionName);
+      
+      // Exportar a archivo
+      XLSX.writeFile(wb, `${collectionName}_${new Date().toISOString().split('T')[0]}.xlsx`);
+      
+      loadingIndicator.style.display = "none";
+      showNotification("Datos exportados correctamente ✅");
+    }).catch(error => {
+      loadingIndicator.style.display = "none";
+      console.error("Error exportando datos: ", error);
+      showNotification("Error exportando datos: " + error.message, "error");
+    });
+  }
 
+  // Confirmar antes de salir si hay cambios sin guardar
+  window.addEventListener('beforeunload', (e) => {
+    if (cambiosPendientes) {
+      e.preventDefault();
+      e.returnValue = '';
+    }
+  });
 
-  
+  // Cerrar modal al hacer clic fuera de él
+  userModal.addEventListener('click', (e) => {
+    if (e.target === userModal) {
+      closeModal();
+    }
+  });
+
+  // Cargar la primera pestaña al inicio
+  window.onload = cargarTabla;
+</script>
+
 </body>
 </html>
-
-
-
