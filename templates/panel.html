@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -250,6 +251,7 @@
     border-bottom: 1px solid var(--border);
     font-size: 0.8rem;
     height: 32px;
+    vertical-align: middle;
   }
   
   th {
@@ -350,13 +352,34 @@
     border-radius: 8px;
     padding: 20px;
     box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    position: relative;
+  }
+  
+  .stat-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
   }
   
   .stat-card h3 {
     color: var(--primary);
-    margin-top: 0;
-    margin-bottom: 15px;
+    margin: 0;
     font-size: 1rem;
+  }
+  
+  .copy-btn {
+    background: var(--light);
+    border: none;
+    border-radius: 4px;
+    padding: 5px 10px;
+    cursor: pointer;
+    color: var(--dark);
+    transition: background 0.3s;
+  }
+  
+  .copy-btn:hover {
+    background: var(--border);
   }
   
   .chart-container {
@@ -589,6 +612,28 @@
     100% { transform: rotate(360deg); }
   }
   
+  /* Progress Bar */
+  .progress-container {
+    margin: 20px 0;
+    border-radius: 5px;
+    overflow: hidden;
+    background-color: #e9ecef;
+    height: 20px;
+  }
+  
+  .progress-bar {
+    height: 100%;
+    background-color: var(--accent);
+    width: 0%;
+    transition: width 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 12px;
+    font-weight: bold;
+  }
+  
   /* Responsive */
   @media (max-width: 900px) {
     .container {
@@ -672,6 +717,8 @@
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <!-- Chart.js -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<!-- html2canvas para copiar gráficos -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 </head>
 <body>
 
@@ -730,7 +777,6 @@
             <i class="fas fa-file-import"></i> Actualizar desde Excel
           </button>
           <input type="file" id="fileInput" accept=".xlsx, .xls" style="display: none;" onchange="handleExcelUpload(event)">
-
         </div>
         
         <div class="table-container">
@@ -771,21 +817,36 @@
       <div id="estadisticas-content" style="display: none;">
         <div class="stats-container">
           <div class="stat-card">
-            <h3>Distribución por Carrera</h3>
+            <div class="stat-card-header">
+              <h3>Distribución por Carrera</h3>
+              <button class="copy-btn" onclick="copiarGrafico('carreraChart', 'Distribución por Carrera')">
+                <i class="fas fa-copy"></i> Copiar
+              </button>
+            </div>
             <div class="chart-container">
               <canvas id="carreraChart"></canvas>
             </div>
           </div>
           
           <div class="stat-card">
-            <h3>Distribución por Región</h3>
+            <div class="stat-card-header">
+              <h3>Distribución por Región</h3>
+              <button class="copy-btn" onclick="copiarGrafico('regionChart', 'Distribución por Región')">
+                <i class="fas fa-copy"></i> Copiar
+              </button>
+            </div>
             <div class="chart-container">
               <canvas id="regionChart"></canvas>
             </div>
           </div>
           
           <div class="stat-card">
-            <h3>Distribución por Modalidad</h3>
+            <div class="stat-card-header">
+              <h3>Distribución por Modalidad</h3>
+              <button class="copy-btn" onclick="copiarGrafico('modalidadChart', 'Distribución por Modalidad')">
+                <i class="fas fa-copy"></i> Copiar
+              </button>
+            </div>
             <div class="chart-container">
               <canvas id="modalidadChart"></canvas>
             </div>
@@ -826,19 +887,17 @@
         <button class="btn btn-primary" onclick="processExcelData('add')">Agregar nueva información</button>
       </div>
       <div id="progressContainer" style="display: none;">
-        <div style="display: flex; justify-content: space-between;">
+        <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
           <span id="progressStatus">Cargando...</span>
           <span id="progressPercent">0%</span>
         </div>
-        <div style="height: 10px; background-color: #e9ecef; border-radius: 5px; overflow: hidden;">
-          <div id="progressBar" style="height: 100%; width: 0%; background-color: #28a745; transition: width 0.3s;"></div>
+        <div class="progress-container">
+          <div id="progressBar" class="progress-bar">0%</div>
         </div>
       </div>
     </div>
   </div>
 </div>
-
-
 
 <!-- Modal para detalles de usuario -->
 <div class="modal-overlay" id="userModal">
@@ -914,6 +973,10 @@
   let currentCalendarMonth = new Date().getMonth();
   let currentCalendarYear = new Date().getFullYear();
   let currentCalendarDni = "";
+
+  // Variables para importación de Excel
+  let excelData = [];
+  let excelHeaders = [];
 
   function toggleSidebar() {
     sidebar.classList.toggle('active');
@@ -1038,12 +1101,15 @@
       allKeys = Array.from(allKeys);
       
       // Orden personalizado para la colección registros
-      const ordenDeseado = ['nombre', 'dni', 'carrera', 'region', 'modalidad', 'celular', 'fecha', 'totalAsistencias'];
+      const ordenDeseado = ['nombre', 'dni', 'carrera', 'region', 'modalidad', 'celular', 'fecha'];
       allKeys = ordenDeseado.filter(key => allKeys.includes(key));
       
       // Agregar cualquier campo adicional que no esté en el orden deseado
       const camposAdicionales = allKeys.filter(key => !ordenDeseado.includes(key));
       allKeys = allKeys.concat(camposAdicionales);
+      
+      // Eliminar totalAsistencias de las columnas mostradas
+      allKeys = allKeys.filter(key => key !== 'totalAsistencias');
       
       // Crear encabezados
       let trHead = "<tr>";
@@ -1392,9 +1458,39 @@
       charts[canvasId].destroy();
     }
     
-    // Preparar datos para el gráfico
-    const labels = Object.keys(datos);
-    const values = Object.values(datos);
+    // Preparar datos para el gráfico - mostrar solo las 5 principales y agrupar el resto como "Otros"
+    let labels = Object.keys(datos);
+    let values = Object.values(datos);
+    
+    // Si hay más de 5 categorías, agrupar las menos significativas como "Otros"
+    if (labels.length > 5) {
+      // Crear array de objetos para ordenar
+      const dataArray = labels.map((label, index) => {
+        return { label: label, value: values[index] };
+      });
+      
+      // Ordenar de mayor a menor
+      dataArray.sort((a, b) => b.value - a.value);
+      
+      // Tomar las 5 principales
+      const top5 = dataArray.slice(0, 5);
+      
+      // Sumar el resto
+      const otrosValue = dataArray.slice(5).reduce((sum, item) => sum + item.value, 0);
+      
+      // Reconstruir labels y values
+      labels = top5.map(item => item.label);
+      values = top5.map(item => item.value);
+      
+      // Agregar "Otros" si hay valores
+      if (otrosValue > 0) {
+        labels.push('Otros');
+        values.push(otrosValue);
+      }
+    }
+    
+    // Calcular total para porcentajes
+    const total = values.reduce((a, b) => a + b, 0);
     
     // Colores para el gráfico
     const backgroundColors = [
@@ -1405,7 +1501,10 @@
     charts[canvasId] = new Chart(ctx, {
       type: 'pie',
       data: {
-        labels: labels,
+        labels: labels.map((label, i) => {
+          const percentage = ((values[i] / total) * 100).toFixed(1);
+          return `${label}: ${percentage}% (${values[i]})`;
+        }),
         datasets: [{
           data: values,
           backgroundColor: backgroundColors,
@@ -1421,15 +1520,70 @@
             position: 'right',
             labels: {
               boxWidth: 15,
-              padding: 15
+              padding: 15,
+              font: {
+                family: 'Arial',
+                size: 13
+              }
             }
           },
-          title: {
-            display: true,
-            text: titulo
+          tooltip: {
+            callbacks: {
+              label: function(context) {
+                const label = context.label || '';
+                const value = context.raw || 0;
+                const percentage = ((value / total) * 100).toFixed(1);
+                return `${label.split(':')[0]}: ${value} (${percentage}%)`;
+              }
+            }
           }
         }
       }
+    });
+  }
+
+  function copiarGrafico(canvasId, titulo) {
+    // Crear un contenedor temporal para el gráfico con título
+    const container = document.createElement('div');
+    container.style.position = 'absolute';
+    container.style.left = '-9999px';
+    container.style.fontFamily = 'Arial';
+    
+    // Agregar título
+    const titleElement = document.createElement('h3');
+    titleElement.textContent = titulo;
+    titleElement.style.fontSize = '13px';
+    titleElement.style.textAlign = 'center';
+    titleElement.style.marginBottom = '10px';
+    container.appendChild(titleElement);
+    
+    // Agregar el canvas del gráfico
+    const canvas = document.getElementById(canvasId);
+    const canvasClone = canvas.cloneNode(true);
+    container.appendChild(canvasClone);
+    
+    // Agregar al documento
+    document.body.appendChild(container);
+    
+    // Usar html2canvas para capturar el contenido
+    html2canvas(container).then(canvas => {
+      // Convertir a blob
+      canvas.toBlob(function(blob) {
+        // Copiar al portapapeles
+        const item = new ClipboardItem({ "image/png": blob });
+        navigator.clipboard.write([item])
+          .then(() => {
+            showNotification("Gráfico copiado al portapapeles");
+          })
+          .catch(err => {
+            console.error('Error al copiar el gráfico: ', err);
+            showNotification("Error al copiar el gráfico", "error");
+          })
+          .finally(() => {
+            // Eliminar el contenedor temporal
+            document.body.removeChild(container);
+          });
+      });
     });
   }
 
@@ -1656,9 +1810,6 @@
       });
   });
 
-  
-  let excelData = [];
-  
   function handleExcelUpload(event) {
     const file = event.target.files[0];
     if (!file) return;
@@ -1672,13 +1823,13 @@
       const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
   
       // Asumimos que la primera fila son los encabezados
-      const headers = jsonData[0];
+      excelHeaders = jsonData[0];
       const rows = jsonData.slice(1);
   
       // Convertir a array de objetos
       excelData = rows.map(row => {
         let obj = {};
-        headers.forEach((header, i) => {
+        excelHeaders.forEach((header, i) => {
           obj[header] = row[i] || '';
         });
         return obj;
@@ -1704,101 +1855,279 @@
     progressContainer.style.display = 'block';
     progressStatus.textContent = 'Iniciando...';
     progressBar.style.width = '0%';
+    progressBar.textContent = '0%';
     progressPercent.textContent = '0%';
   
     // Si mode es 'replace', primero eliminamos todos los documentos existentes
     if (mode === 'replace') {
-      // Eliminar todos los documentos (esto requiere una función especial)
       deleteAllDocuments().then(() => {
         uploadDataWithProgress();
+      }).catch(error => {
+        console.error("Error eliminando documentos: ", error);
+        showNotification("Error eliminando documentos: " + error.message, "error");
+        progressContainer.style.display = 'none';
       });
     } else {
-      uploadDataWithProgress();
+      // Para el modo 'add', necesitamos obtener los DNIs existentes primero
+      getExistingDnis().then(existingDnis => {
+        uploadDataWithProgress(existingDnis);
+      }).catch(error => {
+        console.error("Error obteniendo DNIs existentes: ", error);
+        showNotification("Error obteniendo DNIs existentes: " + error.message, "error");
+        progressContainer.style.display = 'none';
+      });
     }
   
-    function uploadDataWithProgress() {
+    function uploadDataWithProgress(existingDnis = new Set()) {
       let processed = 0;
       const total = excelData.length;
+      const batch = db.batch();
+      const registrosRef = db.collection("registros");
       
       const processNext = () => {
         if (processed >= total) {
-          progressStatus.textContent = 'Completado!';
-          showNotification("Datos importados correctamente ✅");
-          // Recargar la tabla después de un breve retraso
-          setTimeout(() => {
-            progressContainer.style.display = 'none';
-            cargarTabla();
-          }, 1000);
+          // Commit el batch final
+          batch.commit()
+            .then(() => {
+              progressStatus.textContent = 'Completado!';
+              progressBar.textContent = '100%';
+              progressBar.style.width = '100%';
+              progressPercent.textContent = '100%';
+              
+              showNotification("Datos importados correctamente ✅");
+              // Recargar la tabla después de un breve retraso
+              setTimeout(() => {
+                progressContainer.style.display = 'none';
+                cargarTabla();
+              }, 1000);
+            })
+            .catch(error => {
+              console.error("Error committing batch: ", error);
+              showNotification("Error importando datos: " + error.message, "error");
+              progressContainer.style.display = 'none';
+            });
           return;
         }
   
         const data = excelData[processed];
-        // Aquí va tu lógica para subir cada documento a Firestore
+        
+        // Para el modo 'add', verificar si el DNI ya existe
+        if (mode === 'add' && data.dni && existingDnis.has(data.dni.toString())) {
+          // Saltar este registro porque ya existe
+          processed++;
+          const percent = Math.round((processed / total) * 100);
+          progressBar.style.width = percent + '%';
+          progressBar.textContent = percent + '%';
+          progressPercent.textContent = percent + '%';
+          progressStatus.textContent = `Procesando ${processed} de ${total} registros`;
+          
+          // Procesar el siguiente
+          setTimeout(processNext, 10);
+          return;
+        }
+        
+        // Crear un nuevo documento
+        const nuevoDocRef = registrosRef.doc();
+        
+        // Añadir timestamp si no existe
+        if (!data.fecha) {
+          data.fecha = firebase.firestore.FieldValue.serverTimestamp();
+        }
+        
+        // Añadir al batch
+        batch.set(nuevoDocRef, data);
         
         // Actualizar progreso
         processed++;
         const percent = Math.round((processed / total) * 100);
         progressBar.style.width = percent + '%';
+        progressBar.textContent = percent + '%';
         progressPercent.textContent = percent + '%';
         progressStatus.textContent = `Procesando ${processed} de ${total} registros`;
   
-        // Procesar el siguiente con un pequeño retraso para no saturar
-        setTimeout(processNext, 50);
+        // Si el batch tiene 500 operaciones, commit y crear nuevo batch
+        if (processed % 500 === 0) {
+          batch.commit()
+            .then(() => {
+              // Continuar con el siguiente lote
+              setTimeout(processNext, 10);
+            })
+            .catch(error => {
+              console.error("Error committing batch: ", error);
+              showNotification("Error importando datos: " + error.message, "error");
+              progressContainer.style.display = 'none';
+            });
+        } else {
+          // Procesar el siguiente con un pequeño retraso
+          setTimeout(processNext, 10);
+        }
       };
   
       processNext();
     }
   }
   
-  // Función para eliminar todos los documentos (para el modo reemplazar)
+  // Función para obtener todos los DNIs existentes
+  async function getExistingDnis() {
+    const snapshot = await db.collection("registros").get();
+    const existingDnis = new Set();
+    
+    snapshot.forEach(doc => {
+      const data = doc.data();
+      if (data.dni) {
+        existingDnis.add(data.dni.toString());
+      }
+    });
+    
+    return existingDnis;
+  }
+  
+  // Función para eliminar todos los documentos
   async function deleteAllDocuments() {
-    // Implementación específica según tu base de datos
-  }  
-  
-  
-  
+    const progressBar = document.getElementById('progressBar');
+    const progressPercent = document.getElementById('progressPercent');
+    const progressStatus = document.getElementById('progressStatus');
+    
+    progressStatus.textContent = 'Eliminando documentos existentes...';
+    
+    // Obtener todos los documentos
+    const snapshot = await db.collection("registros").get();
+    const total = snapshot.size;
+    let deleted = 0;
+    
+    // Eliminar en lotes de 500
+    const batch = db.batch();
+    const batchSize = 500;
+    let batchCount = 0;
+    
+    snapshot.forEach(doc => {
+      batch.delete(doc.ref);
+      deleted++;
+      batchCount++;
+      
+      const percent = Math.round((deleted / total) * 100);
+      progressBar.style.width = percent + '%';
+      progressBar.textContent = percent + '%';
+      progressPercent.textContent = percent + '%';
+      
+      // Si el batch alcanza el tamaño máximo, commit y crear nuevo batch
+      if (batchCount >= batchSize) {
+        batch.commit();
+        batchCount = 0;
+      }
+    });
+    
+    // Commit el batch final
+    if (batchCount > 0) {
+      await batch.commit();
+    }
+    
+    return Promise.resolve();
+  }
   
   function exportToExcel() {
     loadingIndicator.style.display = "block";
     loadingIndicator.querySelector("p").textContent = "Preparando datos para exportar...";
     
-    // Obtener todas las asistencias y procesarlas por DNI
-    db.collection("asistencias").get().then(asistenciasSnapshot => {
-      const asistenciasPorDni = {};
+    // Obtener todos los registros
+    db.collection("registros").get().then(snapshot => {
+      if (snapshot.empty) {
+        showNotification("No hay datos para exportar", "error");
+        loadingIndicator.style.display = "none";
+        return;
+      }
       
-      asistenciasSnapshot.forEach(doc => {
-        const asistencia = doc.data();
-        const dni = asistencia.dni;
+      // Obtener todas las asistencias para contar por DNI
+      db.collection("asistencias").get().then(asistenciasSnapshot => {
+        const asistenciasPorDni = {};
         
-        if (dni) {
-          if (!asistenciasPorDni[dni]) {
-            asistenciasPorDni[dni] = new Set();
-          }
+        asistenciasSnapshot.forEach(doc => {
+          const asistencia = doc.data();
+          const dni = asistencia.dni;
           
-          // Procesar la fecha para contar una por día
-          if (asistencia.fecha && typeof asistencia.fecha.toDate === 'function') {
-            const fecha = asistencia.fecha.toDate();
-            const fechaStr = fecha.toISOString().split('T')[0]; // YYYY-MM-DD
-            asistenciasPorDni[dni].add(fechaStr);
+          if (dni) {
+            if (!asistenciasPorDni[dni]) {
+              asistenciasPorDni[dni] = new Set();
+            }
+            
+            // Procesar la fecha para contar una por día
+            if (asistencia.fecha && typeof asistencia.fecha.toDate === 'function') {
+              const fecha = asistencia.fecha.toDate();
+              const fechaStr = fecha.toISOString().split('T')[0]; // YYYY-MM-DD
+              asistenciasPorDni[dni].add(fechaStr);
+            }
           }
-        }
+        });
+        
+        // Convertir el Set a la cuenta
+        const totalAsistenciasPorDni = {};
+        Object.keys(asistenciasPorDni).forEach(dni => {
+          totalAsistenciasPorDni[dni] = asistenciasPorDni[dni].size;
+        });
+        
+        // Obtener todas las claves únicas de todos los documentos
+        const allKeysSet = new Set();
+        snapshot.forEach(doc => {
+          Object.keys(doc.data()).forEach(key => allKeysSet.add(key));
+        });
+        
+        // Eliminar totalAsistencias ya que lo reemplazaremos con Asistencias
+        allKeysSet.delete('totalAsistencias');
+        
+        // Convertir a array
+        const allKeys = Array.from(allKeysSet);
+        
+        // Añadir columna de asistencias
+        allKeys.push('Asistencias');
+        
+        // Crear datos para exportar
+        const dataToExport = [allKeys]; // Encabezados
+        
+        // Llenar los datos
+        snapshot.forEach(doc => {
+          const data = doc.data();
+          const row = [];
+          
+          allKeys.forEach(header => {
+            if (header === 'Asistencias') {
+              // Obtener el número de asistencias para este alumno
+              const dni = data.dni;
+              const asistencias = totalAsistenciasPorDni[dni] || 0;
+              row.push(asistencias);
+            } else {
+              row.push(formatearValor(data[header]));
+            }
+          });
+          
+          dataToExport.push(row);
+        });
+        
+        // Crear libro de trabajo de Excel
+        const wb = XLSX.utils.book_new();
+        const ws = XLSX.utils.aoa_to_sheet(dataToExport);
+        
+        // Ajustar el ancho de las columnas
+        const colWidths = allKeys.map(() => ({ wch: 20 }));
+        ws['!cols'] = colWidths;
+        
+        XLSX.utils.book_append_sheet(wb, ws, "registros");
+        
+        // Exportar a archivo
+        XLSX.writeFile(wb, `registros_${new Date().toISOString().split('T')[0]}.xlsx`);
+        
+        loadingIndicator.style.display = "none";
+        showNotification("Datos exportados correctamente ✅");
+      }).catch(error => {
+        loadingIndicator.style.display = "none";
+        console.error("Error obteniendo asistencias: ", error);
+        showNotification("Error exportando datos: " + error.message, "error");
       });
-      
-      // Convertir el Set a la cuenta
-      const totalAsistenciasPorDni = {};
-      Object.keys(asistenciasPorDni).forEach(dni => {
-        totalAsistenciasPorDni[dni] = asistenciasPorDni[dni].size;
-      });
-      
-      // Ahora obtener los registros de alumnos
-      return db.collection("registros").get();
-    }).then(snapshot => {
-      // Resto del código de exportación...
-      // Usar totalAsistenciasPorDni[dni] para obtener el total de asistencias
     }).catch(error => {
-      // Manejo de errores...
+      loadingIndicator.style.display = "none";
+      console.error("Error exportando datos: ", error);
+      showNotification("Error exportando datos: " + error.message, "error");
     });
-  }  
+  }
 
   // Confirmar antes de salir si hay cambios sin guardar
   window.addEventListener('beforeunload', (e) => {
@@ -1819,6 +2148,13 @@
   calendarModal.addEventListener('click', (e) => {
     if (e.target === calendarModal) {
       closeCalendarModal();
+    }
+  });
+
+  // Cerrar modal de Excel al hacer clic fuera
+  document.getElementById('excelModal').addEventListener('click', (e) => {
+    if (e.target === document.getElementById('excelModal')) {
+      closeExcelModal();
     }
   });
 
