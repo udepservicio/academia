@@ -13,25 +13,30 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
     <style>
         :root {
-            --base-color: #d1d9e6; /* Color base más oscuro */
-            --card-color: #e0e5ec; /* Color original de la tarjeta */
+            --base-color: #d1d9e6; 
+            --card-color: #e0e5ec; 
             --shadow-dark: #a3b1c6;
             --shadow-light: #ffffff;
             --text-primary: #4a5464;
             --text-secondary: #8c9cb6;
         }
 
+        html, body {
+            margin: 0;
+            padding: 0;
+            height: 100%; /* fallback */
+        }
+
         body {
             background: url("/static/fo.jpg") no-repeat center center fixed;
-            background-size: cover; /* Para que ocupe toda la pantalla */
+            background-size: cover;
             font-family: 'Poppins', sans-serif;
             display: flex;
             justify-content: center;
             align-items: flex-start;
-            min-height: 100vh;
-            margin: 0;
-            padding: 0;
+            min-height: 100dvh; /* altura real disponible */
             position: relative;
+            overflow: hidden; /* evita scroll por la barra del navegador */
         }
 
         .container {
@@ -40,7 +45,7 @@
             align-items: center;
             width: 100%;
             position: absolute;
-            top: 40%; /* Vertical a 65% del centro */
+            top: 40%; 
             left: 50%;
             transform: translate(-50%, -35%);
         }
@@ -49,14 +54,13 @@
             background-color: var(--card-color);
             padding: 6%;
             border-radius: 40px;
-            /* ELIMINADO: box-shadow con efecto neumórfico */
-            box-shadow: none; /* Sin sombra ni iluminado */
+            box-shadow: none;
             text-align: center;
             width: 80%;
             max-width: 230px;
             position: relative;
             z-index: 1;
-            border: 1px solid rgba(163, 177, 198, 0.3); /* Borde sutil opcional */
+            border: 1px solid rgba(163, 177, 198, 0.3);
         }
 
         .logo-section .logo {
@@ -66,13 +70,12 @@
             max-height: 100px;
             margin: 0 auto 5%;
             border-radius: 50%;
-            /* También eliminamos la sombra del logo para consistencia */
             box-shadow: none;
             display: flex;
             justify-content: center;
             align-items: center;
             overflow: hidden;
-            border: 1px solid rgba(163, 177, 198, 0.3); /* Borde sutil opcional */
+            border: 1px solid rgba(163, 177, 198, 0.3);
         }
 
         .logo img {
@@ -101,9 +104,8 @@
             border-radius: 20px;
             padding: 3% 5%;
             margin: 5% 0;
-            /* También eliminamos el efecto de sombra interior */
             box-shadow: none;
-            border: 1px solid rgba(163, 177, 198, 0.3); /* Borde sutil opcional */
+            border: 1px solid rgba(163, 177, 198, 0.3);
         }
 
         .input-group i {
@@ -122,27 +124,21 @@
         }
 
         .login-btn {
-            background-color: #1E3A5F; /* Azul marino/azul acero */
+            background-color: #1E3A5F;
             color: white;
             border: none;
             padding: 3% 5%;
             border-radius: 25px;
-            font-size: 14px; /* Tipografía más pequeña */
+            font-size: 14px;
             font-weight: 600;
             cursor: pointer;
             width: 100%;
-            /* También eliminamos la sombra del botón */
             box-shadow: none;
             transition: all 0.3s ease;
-            
-            
-            position: relative;       /* necesario para el brillo */
-            overflow: hidden;         /* para que el brillo no se salga */          
-            
-            
+            position: relative;
+            overflow: hidden;
         }
 
-  
         .login-btn::before {
           content: "";
           position: absolute;
@@ -162,14 +158,11 @@
         
         @keyframes shine {
           0% { left: -75%; }
-          50% { left: 125%; }   /* brillo rápido al inicio del ciclo */
-          100% { left: 125%; } /* espera hasta completar 10s */
+          50% { left: 125%; }
+          100% { left: 125%; }
         }
 
-        .login-btn:hover {
-            /* Mantenemos solo un efecto sutil en hover */
-            opacity: 0.9;
-        }
+        .login-btn:hover { opacity: 0.9; }
 
         .links {
             margin-top: 8%;
@@ -182,15 +175,10 @@
             margin: 0 5px;
         }
 
-        .links a:hover {
-            text-decoration: underline;
-        }
+        .links a:hover { text-decoration: underline; }
 
-        .links span {
-            color: var(--text-secondary);
-        }
+        .links span { color: var(--text-secondary); }
 
-        /* Estilos para la pantalla de carga */
         #loading-screen {
             display: none;
             text-align: center;
@@ -207,21 +195,14 @@
             margin: 0 auto 15px;
         }
 
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
         .loading-text {
             font-size: clamp(14px, 4vw, 16px);
             color: var(--text-primary);
         }
 
-        /* Estilos para la pantalla de éxito */
-        #success-screen {
-            display: none;
-            text-align: center;
-        }
+        #success-screen { display: none; text-align: center; }
 
         .success-icon {
             font-size: clamp(40px, 10vw, 60px);
@@ -251,87 +232,42 @@
             font-size: clamp(14px, 4vw, 16px);
             font-weight: 600;
             cursor: pointer;
-            /* También eliminamos la sombra del botón de volver */
             box-shadow: none;
             transition: all 0.3s ease;
         }
 
-        .back-btn:hover {
-            opacity: 0.9;
-        }
+        .back-btn:hover { opacity: 0.9; }
 
-        /* Media queries para ajustes específicos */
         @media (max-width: 480px) {
-            .card {
-                padding: 10%;
-                width: 85%;
-            }
-            
-            .input-group {
-                padding: 4% 6%;
-            }
-
-            .login-btn {
-                padding: 3% 4%;
-                font-size: 13px;
-            }
-            
-            .loading-spinner {
-                width: 35px;
-                height: 35px;
-                margin-bottom: 12px;
-            }
+            .card { padding: 10%; width: 85%; }
+            .input-group { padding: 4% 6%; }
+            .login-btn { padding: 3% 4%; font-size: 13px; }
+            .loading-spinner { width: 35px; height: 35px; margin-bottom: 12px; }
         }
 
         @media (min-width: 1200px) {
-            .card {
-                padding: 40px;
-            }
+            .card { padding: 40px; }
         }
-        
-        
-        /* Animación de entrada */
+
         @keyframes cardEnter {
-            0% {
-                transform: translateY(50px) scale(0.8) rotateX(10deg);
-                opacity: 0;
-            }
-            60% {
-                transform: translateY(-10px) scale(1.05) rotateX(-5deg);
-                opacity: 1;
-            }
-            100% {
-                transform: translateY(0) scale(1) rotateX(0deg);
-                opacity: 1;
-            }
+            0% { transform: translateY(50px) scale(0.8) rotateX(10deg); opacity: 0; }
+            60% { transform: translateY(-10px) scale(1.05) rotateX(-5deg); opacity: 1; }
+            100% { transform: translateY(0) scale(1) rotateX(0deg); opacity: 1; }
         }
-        
-        /* Animación de salida */
+
         @keyframes cardExit {
-            0% {
-                transform: translateY(0) scale(1) rotateX(0deg);
-                opacity: 1;
-            }
-            100% {
-                transform: translateY(-30px) scale(0.7) rotateX(20deg);
-                opacity: 0;
-            }
+            0% { transform: translateY(0) scale(1) rotateX(0deg); opacity: 1; }
+            100% { transform: translateY(-30px) scale(0.7) rotateX(20deg); opacity: 0; }
         }
-        
-        /* Clases para aplicar animaciones */
-        .animate-enter {
-            animation: cardEnter 0.8s ease-out forwards;
-        }
-        
-        .animate-exit {
-            animation: cardExit 0.6s ease-in forwards;
-        }        
+
+        .animate-enter { animation: cardEnter 0.8s ease-out forwards; }
+        .animate-exit { animation: cardExit 0.6s ease-in forwards; }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="card">
-            <!-- Formulario de login (visible inicialmente) -->
+            <!-- Pantallas -->
             <div id="login-screen">
                 <div class="logo-section">
                     <div class="logo">
@@ -350,24 +286,19 @@
                         <input type="password" id="password" placeholder="Código del día" required>
                     </div>
                     <button type="submit" class="login-btn">Registrar Asistencia</button>
-                   
                 </form>
                 <div class="links">
                     <a href="/registro">Quiero ser alumno</a>
                 </div>
             </div>
 
-            <!-- Pantalla de carga -->
             <div id="loading-screen">
                 <div class="loading-spinner"></div>
                 <div class="loading-text">Registrando asistencia...</div>
             </div>
 
-            <!-- Pantalla de éxito (oculta inicialmente) -->
             <div id="success-screen">
-                <div class="success-icon">
-                    <i class="fas fa-check-circle"></i>
-                </div>
+                <div class="success-icon"><i class="fas fa-check-circle"></i></div>
                 <div class="success-message">¡Asistencia registrada!</div>
                 <div class="success-date" id="fecha-asistencia"></div>
                 <button class="back-btn" onclick="window.location.reload()">Volver</button>
@@ -376,7 +307,15 @@
     </div>
 
     <script>
-        // Configuración Firebase
+        // Fallback JS: asegura que la altura se ajuste al área visible real
+        function ajustarAltura() {
+            document.body.style.minHeight = window.innerHeight + "px";
+        }
+        window.addEventListener("resize", ajustarAltura);
+        window.addEventListener("orientationchange", ajustarAltura);
+        ajustarAltura();
+
+        // Firebase Config
         const firebaseConfig = {
             apiKey: "AIzaSyCohuXeXlI6z8R0RXEIWeL4atI9zkpj_i4",
             authDomain: "academia-udep-43440.firebaseapp.com",
@@ -385,34 +324,21 @@
             messagingSenderId: "853553587165",
             appId: "1:853553587165:web:d2fd928f520d51276e4c34"
         };
-        
-        // Inicializar Firebase
-        try {
-            firebase.initializeApp(firebaseConfig);
-        } catch (error) {
-            console.error("Error inicializando Firebase: ", error);
-        }
+        try { firebase.initializeApp(firebaseConfig); } 
+        catch (error) { console.error("Error inicializando Firebase: ", error); }
         
         const db = firebase.firestore();
 
-        // Función para formatear la fecha en español
         function obtenerFechaHoy() {
             const fecha = new Date();
             const opciones = { weekday: 'long', day: 'numeric', month: 'long' };
-            const fechaFormateada = fecha.toLocaleDateString('es-ES', opciones);
-            return fechaFormateada.replace(/^\w/, c => c.toUpperCase());
+            return fecha.toLocaleDateString('es-ES', opciones).replace(/^\w/, c => c.toUpperCase());
         }
 
-        // Función para lanzar confeti
         function lanzarConfeti() {
-            confetti({
-                particleCount: 150,
-                spread: 70,
-                origin: { y: 0.6 }
-            });
+            confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
         }
 
-        // Función para guardar en Firebase
         function guardarEnFirebase(dni, codigoDia) {
             return db.collection("asistencias").add({
                 dni: dni,
@@ -421,64 +347,46 @@
             });
         }
 
-        // Manejar el envío del formulario
         document.getElementById('login-form').addEventListener('submit', function(event) {
             event.preventDefault();
-        
             const username = document.getElementById('username').value;
             const password = document.getElementById('password').value;
-        
             if (username && password) {
-                // Ocultar formulario y mostrar pantalla de carga
                 document.getElementById('login-screen').style.display = 'none';
                 document.getElementById('loading-screen').style.display = 'block';
                 document.getElementById('success-screen').style.display = 'none';
-        
-                // Enviar DNI y palabra "SI"
+                
                 const formData = new FormData();
                 formData.append('dni', username);
                 formData.append('valor', 'SI');
                 
-                // Promesas para ambas operaciones
                 const appScriptPromise = fetch('https://script.google.com/macros/s/AKfycbzc1vNYwn6Ml-ndQVnY__HpwJWN8kelLd4bLHxGNuf7PytDrw4K485nRi1-Ei7Te5yd0Q/exec', {
-                    method: 'POST',
-                    body: formData
+                    method: 'POST', body: formData
                 });
-                
                 const firebasePromise = guardarEnFirebase(username, password);
                 
-                // Ejecutar ambas operaciones en paralelo
                 Promise.all([appScriptPromise, firebasePromise])
-                .then(([appScriptResponse, firebaseResult]) => {
-                    return Promise.all([appScriptResponse.text(), firebaseResult]);
-                })
+                .then(([appScriptResponse, firebaseResult]) => Promise.all([appScriptResponse.text(), firebaseResult]))
                 .then(([appScriptData, firebaseData]) => {
-                    // Ocultar pantalla de carga
                     document.getElementById('loading-screen').style.display = 'none';
-                    
-                    // Mostrar pantalla de éxito y confeti
                     document.getElementById('fecha-asistencia').textContent = 
                         "Tu asistencia a la clase del " + obtenerFechaHoy() + " ha sido registrada.";
-                    
                     document.getElementById('success-screen').style.display = 'block';
                     lanzarConfeti();
                 })
                 .catch(error => {
-                    // En caso de error, volver al formulario
                     document.getElementById('loading-screen').style.display = 'none';
                     document.getElementById('login-screen').style.display = 'block';
                     alert('Error al registrar la asistencia: ' + error);
                 });
-        
             } else {
                 alert("Por favor, complete todos los campos.");
             }
         });
 
-        
         window.addEventListener('load', () => {
             document.getElementById('login-screen').classList.add('animate-enter');
-        });           
+        });
     </script>
 </body>
 </html>
