@@ -1,5 +1,6 @@
 
 
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -1657,74 +1658,78 @@
     }
   }
 
+
   function verDetallesAlumno(userId) {
-    loadingIndicator.style.display = "block";
-    
-    // Obtener datos del alumno desde la colección "registros"
-    db.collection('registros').doc(userId).get().then(userDoc => {
-      if (!userDoc.exists) {
-        showNotification("Alumno no encontrado", "error");
-        loadingIndicator.style.display = "none";
-        return;
-      }
+      console.log("Intentando ver detalles del ID:", userId);
+      loadingIndicator.style.display = "block";
       
-      const userData = userDoc.data();
-      
-      // Construir el modal con la información del alumno
-      userModalBody.innerHTML = `
-        <div class="user-info">
-          <div class="info-item">
-            <div class="info-label">Nombre</div>
-            <div class="info-value">${userData.nombre || 'No especificado'}</div>
-          </div>
+      // Obtener datos del alumno desde la colección "registros"
+      db.collection('registros').doc(userId).get().then(userDoc => {
+          if (!userDoc.exists) {
+              showNotification("Alumno no encontrado", "error");
+              loadingIndicator.style.display = "none";
+              return;
+          }
           
-          <div class="info-item">
-            <div class="info-label">DNI</div>
-            <div class="info-value">${userData.dni || 'No especificado'}</div>
-          </div>
+          const userData = userDoc.data();
+          console.log("Datos del alumno:", userData);
           
-          <div class="info-item">
-            <div class="info-label">Carrera</div>
-            <div class="info-value">${userData.carrera || 'No especificado'}</div>
-          </div>
+          // Construir el modal con la información del alumno
+          userModalBody.innerHTML = `
+              <div class="user-info">
+                  <div class="info-item">
+                      <div class="info-label">ID del Documento</div>
+                      <div class="info-value">${userId}</div>
+                  </div>
+                  
+                  <div class="info-item">
+                      <div class="info-label">Nombre</div>
+                      <div class="info-value">${userData.nombre || 'No especificado'}</div>
+                  </div>
+                  
+                  <div class="info-item">
+                      <div class="info-label">DNI</div>
+                      <div class="info-value">${userData.dni || 'No especificado'}</div>
+                  </div>
+                  
+                  <div class="info-item">
+                      <div class="info-label">Carrera</div>
+                      <div class="info-value">${userData.carrera || 'No especificado'}</div>
+                  </div>
+                  
+                  <div class="info-item">
+                      <div class="info-label">Región</div>
+                      <div class="info-value">${userData.region || 'No especificado'}</div>
+                  </div>
+                  
+                  <div class="info-item">
+                      <div class="info-label">Modalidad</div>
+                      <div class="info-value">${userData.modalidad || userData.mediidad || 'No especificada'}</div>
+                  </div>
+                  
+                  <div class="info-item">
+                      <div class="info-label">Celular</div>
+                      <div class="info-value">${userData.celular || 'No especificado'}</div>
+                  </div>
+
+                  
+                  <div class="info-item">
+                      <div class="info-label">Fecha de registro</div>
+                      <div class="info-value">${userData.fecha ? (typeof userData.fecha.toDate === 'function' ? userData.fecha.toDate().toLocaleDateString() : userData.fecha) : 'No especificado'}</div>
+                  </div>
+              </div>
+          `;
           
-          <div class="info-item">
-            <div class="info-label">Región</div>
-            <div class="info-value">${userData.region || 'No especificado'}</div>
-          </div>
-          
-          <div class="info-item">
-            <div class="info-label">Modalidad</div>
-            <div class="info-value">${userData.modalidad || 'No especificado'}</div>
-          </div>
-          
-          <div class="info-item">
-            <div class="info-label">Celular</div>
-            <div class="info-value">${userData.celular || 'No especificado'}</div>
-          </div>
-          
-          <div class="info-item">
-            <div class="info-label">Total Asistencias</div>
-            <div class="info-value">${userData.totalAsistencias || 0}</div>
-          </div>
-          
-          <div class="info-item">
-            <div class="info-label">Fecha de registro</div>
-            <div class="info-value">${userData.fecha ? userData.fecha.toDate().toLocaleDateString() : 'No especificado'}</div>
-          </div>
-        </div>
-      `;
-      
-      // Mostrar el modal
-      userModal.classList.add('active');
-      loadingIndicator.style.display = "none";
-    })
-    .catch(error => {
-      loadingIndicator.style.display = "none";
-      console.error("Error obteniendo alumno: ", error);
-      showNotification("Error obteniendo datos del alumno", "error");
-    });
-  }
+          // Mostrar el modal
+          userModal.classList.add('active');
+          loadingIndicator.style.display = "none";
+      })
+      .catch(error => {
+          loadingIndicator.style.display = "none";
+          console.error("Error obteniendo alumno:", error);
+          showNotification("Error obteniendo datos del alumno: " + error.message, "error");
+      });
+  }    
 
   function closeModal() {
     userModal.classList.remove('active');
