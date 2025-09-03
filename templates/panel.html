@@ -1,4 +1,5 @@
 
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -597,6 +598,68 @@
     margin: 15px;
   }
   
+  /* ---------- Forzar layout de la tabla y fijar columna Acciones ---------- */
+  .table-container table {
+    table-layout: fixed; /* columnas respetan los anchos declarados (no se reajustan por contenido) */
+    width: 100%;
+  }
+  
+  /* Columna de acciones (col class) — ajustar ancho si hace falta */
+  .table-container col.actions-col {
+    width: 90px; /* cámbialo por 70/80/100 según prefieras */
+  }
+  
+  /* Asegurar celdas con overflow controlado */
+  .table-container th,
+  .table-container td {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  
+  /* Layout de la celda acciones */
+  .actions-cell {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 0 6px;
+    height: 40px;             /* fuerza altura uniforme para la celda de acciones */
+    box-sizing: border-box;
+    overflow: hidden;
+  }
+  
+  /* Estilo ligero para los íconos clickeables */
+  .action-icon {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    line-height: 20px;
+    font-size: 16px;
+    cursor: pointer;
+    color: var(--gray);
+    text-align: center;
+    vertical-align: middle;
+    margin: 0;
+    padding: 0;
+  }
+  
+  /* hover states */
+  .action-icon:hover { color: var(--primary); }
+  .delete-icon:hover  { color: var(--danger); }
+  
+  /* Reset de estilos si aún quedan botones dentro de tablas */
+  .table-container .icon-btn {
+    margin: 0;
+    padding: 0;
+    border: none;
+    background: transparent;
+    box-shadow: none;
+    outline: none;
+  }
+    
+  
+  
   .spinner {
     border: 2px solid #f3f3f3;
     border-top: 2px solid var(--primary);
@@ -819,9 +882,7 @@
           <div class="stat-card">
             <div class="stat-card-header">
               <h3>Distribución por Carrera</h3>
-              <button class="copy-btn" onclick="copiarGrafico('carreraChart', 'Distribución por Carrera')">
-                <i class="fas fa-copy"></i> Copiar
-              </button>
+
             </div>
             <div class="chart-container">
               <canvas id="carreraChart"></canvas>
@@ -831,9 +892,7 @@
           <div class="stat-card">
             <div class="stat-card-header">
               <h3>Distribución por Región</h3>
-              <button class="copy-btn" onclick="copiarGrafico('regionChart', 'Distribución por Región')">
-                <i class="fas fa-copy"></i> Copiar
-              </button>
+
             </div>
             <div class="chart-container">
               <canvas id="regionChart"></canvas>
@@ -843,9 +902,7 @@
           <div class="stat-card">
             <div class="stat-card-header">
               <h3>Distribución por Modalidad</h3>
-              <button class="copy-btn" onclick="copiarGrafico('modalidadChart', 'Distribución por Modalidad')">
-                <i class="fas fa-copy"></i> Copiar
-              </button>
+
             </div>
             <div class="chart-container">
               <canvas id="modalidadChart"></canvas>
@@ -1121,6 +1178,24 @@
       trHead += "<th>Acciones</th></tr>";
       
       head.innerHTML = trHead;
+      
+      // --- crear/actualizar colgroup para que la última columna sea actions-col (ancho fijo) ---
+      const dataTable = document.getElementById('dataTable');
+      let colgroup = dataTable.querySelector('colgroup');
+      if (!colgroup) {
+        colgroup = document.createElement('colgroup');
+        dataTable.insertBefore(colgroup, dataTable.firstChild);
+      }
+      colgroup.innerHTML = '';
+      // una <col> por cada columna de allKeys
+      for (let i = 0; i < allKeys.length; i++) {
+        colgroup.appendChild(document.createElement('col'));
+      }
+      // col para la columna Acciones
+      const actionsCol = document.createElement('col');
+      actionsCol.className = 'actions-col';
+      colgroup.appendChild(actionsCol);
+            
 
       // Crear filas
       snapshot.forEach(doc => {
@@ -1135,16 +1210,12 @@
         });
         
         // Botones de acción
+
         tr += `<td class="actions-cell">`;
-        tr += `<button class="icon-btn" onclick="verDetallesAlumno('${doc.id}')" title="Ver detalles">
-                  <i class="fas fa-eye"></i>
-               </button>`;
-        tr += `<button class="icon-btn delete-btn" onclick="eliminarFila('${doc.id}', 'registros')" title="Eliminar">
-                  <i class="fas fa-trash"></i>
-               </button>
-              </td>`;
-        
-        tr += "</tr>";
+        tr += `<i class="fas fa-eye action-icon" title="Ver detalles" onclick="verDetallesAlumno('${doc.id}')"></i>`;
+        tr += `<i class="fas fa-trash action-icon delete-icon" title="Eliminar" onclick="eliminarFila('${doc.id}', 'registros')"></i>`;
+        tr += `</td>`;
+
         body.innerHTML += tr;
       });
     }, error => {
@@ -1284,13 +1355,15 @@
         <td>${dni || 'No especificado'}</td>
         <td>${asistencias.total}</td>
         <td>${asistencias.ultimaFecha ? asistencias.ultimaFecha.toLocaleDateString() : 'Nunca'}</td>
+
+        
         <td class="actions-cell">
           ${asistencias.total > 0 ? `
-            <button class="icon-btn" onclick="mostrarCalendarioAsistencias('${dni}', '${alumno.nombre}')" title="Ver calendario de asistencias">
-              <i class="fas fa-calendar-alt"></i>
-            </button>
+            <i class="fas fa-calendar-alt action-icon" title="Ver calendario de asistencias"
+               onclick="mostrarCalendarioAsistencias('${dni}', '${alumno.nombre}')"></i>
           ` : ''}
-        </td>
+        </td>        
+        
       `;
       
       asistenciasBody.appendChild(tr);
@@ -1539,51 +1612,6 @@
           }
         }
       }
-    });
-  }
-
-  function copiarGrafico(canvasId, titulo) {
-    // Crear un contenedor temporal para el gráfico con título
-    const container = document.createElement('div');
-    container.style.position = 'absolute';
-    container.style.left = '-9999px';
-    container.style.fontFamily = 'Arial';
-    
-    // Agregar título
-    const titleElement = document.createElement('h3');
-    titleElement.textContent = titulo;
-    titleElement.style.fontSize = '13px';
-    titleElement.style.textAlign = 'center';
-    titleElement.style.marginBottom = '10px';
-    container.appendChild(titleElement);
-    
-    // Agregar el canvas del gráfico
-    const canvas = document.getElementById(canvasId);
-    const canvasClone = canvas.cloneNode(true);
-    container.appendChild(canvasClone);
-    
-    // Agregar al documento
-    document.body.appendChild(container);
-    
-    // Usar html2canvas para capturar el contenido
-    html2canvas(container).then(canvas => {
-      // Convertir a blob
-      canvas.toBlob(function(blob) {
-        // Copiar al portapapeles
-        const item = new ClipboardItem({ "image/png": blob });
-        navigator.clipboard.write([item])
-          .then(() => {
-            showNotification("Gráfico copiado al portapapeles");
-          })
-          .catch(err => {
-            console.error('Error al copiar el gráfico: ', err);
-            showNotification("Error al copiar el gráfico", "error");
-          })
-          .finally(() => {
-            // Eliminar el contenedor temporal
-            document.body.removeChild(container);
-          });
-      });
     });
   }
 
@@ -2028,7 +2056,7 @@
   function exportToExcel() {
     loadingIndicator.style.display = "block";
     loadingIndicator.querySelector("p").textContent = "Preparando datos para exportar...";
-    
+  
     // Obtener todos los registros
     db.collection("registros").get().then(snapshot => {
       if (snapshot.empty) {
@@ -2036,20 +2064,20 @@
         loadingIndicator.style.display = "none";
         return;
       }
-      
+  
       // Obtener todas las asistencias para contar por DNI
       db.collection("asistencias").get().then(asistenciasSnapshot => {
         const asistenciasPorDni = {};
-        
+  
         asistenciasSnapshot.forEach(doc => {
           const asistencia = doc.data();
           const dni = asistencia.dni;
-          
+  
           if (dni) {
             if (!asistenciasPorDni[dni]) {
               asistenciasPorDni[dni] = new Set();
             }
-            
+  
             // Procesar la fecha para contar una por día
             if (asistencia.fecha && typeof asistencia.fecha.toDate === 'function') {
               const fecha = asistencia.fecha.toDate();
@@ -2058,39 +2086,47 @@
             }
           }
         });
-        
+  
         // Convertir el Set a la cuenta
         const totalAsistenciasPorDni = {};
         Object.keys(asistenciasPorDni).forEach(dni => {
           totalAsistenciasPorDni[dni] = asistenciasPorDni[dni].size;
         });
-        
+  
         // Obtener todas las claves únicas de todos los documentos
         const allKeysSet = new Set();
         snapshot.forEach(doc => {
           Object.keys(doc.data()).forEach(key => allKeysSet.add(key));
         });
-        
-        // Eliminar totalAsistencias ya que lo reemplazaremos con Asistencias
+  
+        // Eliminar cualquier campo de asistencias que venga de los registros
         allKeysSet.delete('totalAsistencias');
-        
+        allKeysSet.delete('Asistencias');
+  
         // Convertir a array
-        const allKeys = Array.from(allKeysSet);
-        
-        // Añadir columna de asistencias
-        allKeys.push('Asistencias');
-        
+        let allKeys = Array.from(allKeysSet);
+  
+        // Opcional: mover 'dni' a primera columna y 'Asistencias' después
+        const dniIndex = allKeys.indexOf('dni');
+        if (dniIndex > -1) {
+          allKeys.splice(dniIndex, 1); // quitar 'dni' de su posición
+          allKeys.unshift('dni'); // poner al inicio
+        }
+  
+        // Insertar 'Asistencias' justo después de 'dni'
+        const dniPosition = allKeys.indexOf('dni');
+        allKeys.splice(dniPosition + 1, 0, 'Asistencias');
+  
         // Crear datos para exportar
         const dataToExport = [allKeys]; // Encabezados
-        
+  
         // Llenar los datos
         snapshot.forEach(doc => {
           const data = doc.data();
           const row = [];
-          
+  
           allKeys.forEach(header => {
             if (header === 'Asistencias') {
-              // Obtener el número de asistencias para este alumno
               const dni = data.dni;
               const asistencias = totalAsistenciasPorDni[dni] || 0;
               row.push(asistencias);
@@ -2098,37 +2134,40 @@
               row.push(formatearValor(data[header]));
             }
           });
-          
+  
           dataToExport.push(row);
         });
-        
+  
         // Crear libro de trabajo de Excel
         const wb = XLSX.utils.book_new();
         const ws = XLSX.utils.aoa_to_sheet(dataToExport);
-        
+  
         // Ajustar el ancho de las columnas
         const colWidths = allKeys.map(() => ({ wch: 20 }));
         ws['!cols'] = colWidths;
-        
+  
         XLSX.utils.book_append_sheet(wb, ws, "registros");
-        
+  
         // Exportar a archivo
         XLSX.writeFile(wb, `registros_${new Date().toISOString().split('T')[0]}.xlsx`);
-        
+  
         loadingIndicator.style.display = "none";
         showNotification("Datos exportados correctamente ✅");
+  
       }).catch(error => {
         loadingIndicator.style.display = "none";
         console.error("Error obteniendo asistencias: ", error);
         showNotification("Error exportando datos: " + error.message, "error");
       });
+  
     }).catch(error => {
       loadingIndicator.style.display = "none";
       console.error("Error exportando datos: ", error);
       showNotification("Error exportando datos: " + error.message, "error");
     });
   }
-
+    
+ 
   // Confirmar antes de salir si hay cambios sin guardar
   window.addEventListener('beforeunload', (e) => {
     if (cambiosPendientes) {
