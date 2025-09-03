@@ -19,12 +19,18 @@
             --shadow-light: #ffffff;
             --text-primary: #4a5464;
             --text-secondary: #8c9cb6;
+            --error-color: #e74c3c;
+            --success-color: #2ecc71;
+        }
+
+        * {
+            box-sizing: border-box;
         }
 
         html, body {
             margin: 0;
             padding: 0;
-            height: 100%; /* fallback */
+            height: 100%;
         }
 
         body {
@@ -33,10 +39,10 @@
             font-family: 'Poppins', sans-serif;
             display: flex;
             justify-content: center;
-            align-items: flex-start;
-            min-height: 100dvh; /* altura real disponible */
+            align-items: center;
+            min-height: 100dvh;
             position: relative;
-            overflow: hidden; /* evita scroll por la barra del navegador */
+            overflow: hidden;
         }
 
         .container {
@@ -44,23 +50,24 @@
             justify-content: center;
             align-items: center;
             width: 100%;
-            position: absolute;
-            top: 40%; 
-            left: 50%;
-            transform: translate(-50%, -35%);
+            height: 100%;
+            position: fixed;
+            top: 0;
+            left: 0;
         }
 
         .card {
             background-color: var(--card-color);
-            padding: 6%;
+            padding: 30px;
             border-radius: 40px;
             box-shadow: none;
             text-align: center;
-            width: 80%;
-            max-width: 230px;
+            width: 90%;
+            max-width: 300px;
             position: relative;
-            z-index: 1;
+            z-index: 2;
             border: 1px solid rgba(163, 177, 198, 0.3);
+            margin: 0 auto;
         }
 
         .logo-section .logo {
@@ -68,7 +75,7 @@
             height: 25vw;
             max-width: 100px;
             max-height: 100px;
-            margin: 0 auto 5%;
+            margin: 0 auto 15px;
             border-radius: 50%;
             box-shadow: none;
             display: flex;
@@ -87,7 +94,7 @@
         .logo-section h2 {
             font-weight: 600;
             color: var(--text-primary);
-            margin-bottom: 2%;
+            margin-bottom: 5px;
             font-size: clamp(16px, 5vw, 24px);
         }
 
@@ -95,6 +102,7 @@
             color: var(--text-secondary);
             margin-top: 0;
             font-size: clamp(12px, 3vw, 14px);
+            margin-bottom: 20px;
         }
 
         .input-group {
@@ -102,8 +110,8 @@
             align-items: center;
             background-color: var(--card-color);
             border-radius: 20px;
-            padding: 3% 5%;
-            margin: 5% 0;
+            padding: 12px 15px;
+            margin: 10px 0;
             box-shadow: none;
             border: 1px solid rgba(163, 177, 198, 0.3);
         }
@@ -127,7 +135,7 @@
             background-color: #1E3A5F;
             color: white;
             border: none;
-            padding: 3% 5%;
+            padding: 12px;
             border-radius: 25px;
             font-size: 14px;
             font-weight: 600;
@@ -137,6 +145,7 @@
             transition: all 0.3s ease;
             position: relative;
             overflow: hidden;
+            margin-top: 15px;
         }
 
         .login-btn::before {
@@ -165,7 +174,7 @@
         .login-btn:hover { opacity: 0.9; }
 
         .links {
-            margin-top: 8%;
+            margin-top: 20px;
             font-size: clamp(12px, 3vw, 14px);
         }
 
@@ -202,32 +211,35 @@
             color: var(--text-primary);
         }
 
-        #success-screen { display: none; text-align: center; }
+        #success-screen { 
+            display: none; 
+            text-align: center; 
+        }
 
         .success-icon {
             font-size: clamp(40px, 10vw, 60px);
-            color: #28a745;
-            margin-bottom: 5%;
+            color: var(--success-color);
+            margin-bottom: 15px;
         }
 
         .success-message {
             font-size: clamp(16px, 5vw, 22px);
             font-weight: 600;
             color: var(--text-primary);
-            margin-bottom: 4%;
+            margin-bottom: 10px;
         }
 
         .success-date {
             font-size: clamp(14px, 4vw, 18px);
             color: var(--text-secondary);
-            margin-bottom: 8%;
+            margin-bottom: 20px;
         }
 
         .back-btn {
             background: linear-gradient(145deg, #6c757d, #495057);
             color: white;
             border: none;
-            padding: 3% 6%;
+            padding: 10px 20px;
             border-radius: 25px;
             font-size: clamp(14px, 4vw, 16px);
             font-weight: 600;
@@ -238,33 +250,133 @@
 
         .back-btn:hover { opacity: 0.9; }
 
+        /* Estilos para la tarjeta de advertencia */
+        #warning-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+
+        #warning-overlay.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        #warning-card {
+            background-color: white;
+            padding: 25px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            max-width: 80%;
+            width: 300px;
+            transform: scale(0.9);
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        #warning-overlay.show #warning-card {
+            transform: scale(1);
+        }
+
+        .warning-icon {
+            font-size: 40px;
+            color: var(--error-color);
+            margin-bottom: 15px;
+        }
+
+        .warning-message {
+            font-size: 16px;
+            color: var(--text-primary);
+            margin-bottom: 20px;
+            line-height: 1.4;
+        }
+
+        .warning-btn {
+            background-color: var(--error-color);
+            color: white;
+            border: none;
+            padding: 10px 25px;
+            border-radius: 20px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .warning-btn:hover {
+            background-color: #c0392b;
+            transform: translateY(-2px);
+        }
+
+        /* Animaciones para la tarjeta principal */
+        @keyframes fadeIn {
+            0% { 
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            100% { 
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .card {
+            animation: fadeIn 0.5s ease-out forwards;
+        }
+
         @media (max-width: 480px) {
-            .card { padding: 10%; width: 85%; }
-            .input-group { padding: 4% 6%; }
-            .login-btn { padding: 3% 4%; font-size: 13px; }
-            .loading-spinner { width: 35px; height: 35px; margin-bottom: 12px; }
+            .card { 
+                padding: 20px; 
+                width: 85%; 
+            }
+            .input-group { 
+                padding: 10px 15px; 
+            }
+            .login-btn { 
+                padding: 12px; 
+                font-size: 14px; 
+            }
+            .loading-spinner { 
+                width: 35px; 
+                height: 35px; 
+                margin-bottom: 12px; 
+            }
+            #warning-card { 
+                width: 80%; 
+                padding: 20px; 
+            }
+            .warning-icon { 
+                font-size: 35px; 
+            }
+            .warning-message { 
+                font-size: 14px; 
+            }
         }
-
-        @media (min-width: 1200px) {
-            .card { padding: 40px; }
-        }
-
-        @keyframes cardEnter {
-            0% { transform: translateY(50px) scale(0.8) rotateX(10deg); opacity: 0; }
-            60% { transform: translateY(-10px) scale(1.05) rotateX(-5deg); opacity: 1; }
-            100% { transform: translateY(0) scale(1) rotateX(0deg); opacity: 1; }
-        }
-
-        @keyframes cardExit {
-            0% { transform: translateY(0) scale(1) rotateX(0deg); opacity: 1; }
-            100% { transform: translateY(-30px) scale(0.7) rotateX(20deg); opacity: 0; }
-        }
-
-        .animate-enter { animation: cardEnter 0.8s ease-out forwards; }
-        .animate-exit { animation: cardExit 0.6s ease-in forwards; }
     </style>
 </head>
 <body>
+    <!-- Overlay y tarjeta de advertencia -->
+    <div id="warning-overlay">
+        <div id="warning-card">
+            <div class="warning-icon">
+                <i class="fas fa-exclamation-circle"></i>
+            </div>
+            <div class="warning-message" id="warning-message">
+                Código no válido. Inténtalo nuevamente.
+            </div>
+            <button class="warning-btn" id="warning-ok-btn">Entendido</button>
+        </div>
+    </div>
+
     <div class="container">
         <div class="card">
             <!-- Pantallas -->
@@ -279,7 +391,7 @@
                 <form id="login-form">
                     <div class="input-group">
                         <i class="fas fa-user"></i>
-                        <input type="text" id="username" placeholder="DNI" required>
+                        <input type="text" id="username" placeholder="DNI" required maxlength="8" pattern="[0-9]{8}">
                     </div>
                     <div class="input-group">
                         <i class="fas fa-lock"></i>
@@ -294,7 +406,7 @@
 
             <div id="loading-screen">
                 <div class="loading-spinner"></div>
-                <div class="loading-text">Registrando asistencia...</div>
+                <div class="loading-text" id="loading-message">Verificando...</div>
             </div>
 
             <div id="success-screen">
@@ -307,14 +419,6 @@
     </div>
 
     <script>
-        // Fallback JS: asegura que la altura se ajuste al área visible real
-        function ajustarAltura() {
-            document.body.style.minHeight = window.innerHeight + "px";
-        }
-        window.addEventListener("resize", ajustarAltura);
-        window.addEventListener("orientationchange", ajustarAltura);
-        ajustarAltura();
-
         // Firebase Config
         const firebaseConfig = {
             apiKey: "AIzaSyCohuXeXlI6z8R0RXEIWeL4atI9zkpj_i4",
@@ -324,10 +428,76 @@
             messagingSenderId: "853553587165",
             appId: "1:853553587165:web:d2fd928f520d51276e4c34"
         };
-        try { firebase.initializeApp(firebaseConfig); } 
-        catch (error) { console.error("Error inicializando Firebase: ", error); }
+        
+        try { 
+            firebase.initializeApp(firebaseConfig); 
+        } catch (error) { 
+            console.error("Error inicializando Firebase: ", error); 
+        }
         
         const db = firebase.firestore();
+
+        // Elementos de la tarjeta de advertencia
+        const warningOverlay = document.getElementById('warning-overlay');
+        const warningMessage = document.getElementById('warning-message');
+        const warningOkBtn = document.getElementById('warning-ok-btn');
+        const loadingMessage = document.getElementById('loading-message');
+
+        // Función para mostrar advertencia
+        function mostrarAdvertencia(mensaje) {
+            warningMessage.textContent = mensaje;
+            warningOverlay.classList.add('show');
+            
+            // Configurar el botón para cerrar la advertencia
+            warningOkBtn.onclick = function() {
+                warningOverlay.classList.remove('show');
+            };
+            
+            // Cerrar al hacer clic fuera de la tarjeta
+            warningOverlay.onclick = function(event) {
+                if (event.target === warningOverlay) {
+                    warningOverlay.classList.remove('show');
+                }
+            };
+        }
+
+        // Validar DNI (8 dígitos)
+        function validarDNI(dni) {
+            return /^\d{8}$/.test(dni);
+        }
+
+        // Consultar si el DNI está registrado en Firebase
+        
+        async function verificarDNI(dni) {
+            try {
+                // Primera consulta: buscar como string
+                const querySnapshotString = await db.collection("registros")
+                    .where("dni", "==", dni)
+                    .get();
+        
+                if (!querySnapshotString.empty) {
+                    return true;
+                }
+        
+                // Si el DNI son solo dígitos, buscar también como número
+                if (/^\d+$/.test(dni)) {
+                    const dniNumber = Number(dni);
+                    const querySnapshotNumber = await db.collection("registros")
+                        .where("dni", "==", dniNumber)
+                        .get();
+        
+                    if (!querySnapshotNumber.empty) {
+                        return true;
+                    }
+                }
+        
+                return false;
+            } catch (error) {
+                console.error("Error al verificar DNI:", error);
+                return false;
+            }
+        }        
+        
 
         function obtenerFechaHoy() {
             const fecha = new Date();
@@ -339,53 +509,92 @@
             confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
         }
 
-        function guardarEnFirebase(dni, codigoDia) {
+        function guardarEnFirebase(dni) {
             return db.collection("asistencias").add({
                 dni: dni,
-                codigoDia: codigoDia,
                 fecha: firebase.firestore.FieldValue.serverTimestamp()
             });
         }
 
-        document.getElementById('login-form').addEventListener('submit', function(event) {
+        // Función para mostrar/ocultar pantallas
+        function mostrarPantalla(id) {
+            document.getElementById('login-screen').style.display = 'none';
+            document.getElementById('loading-screen').style.display = 'none';
+            document.getElementById('success-screen').style.display = 'none';
+            
+            document.getElementById(id).style.display = 'block';
+        }
+
+        document.getElementById('login-form').addEventListener('submit', async function(event) {
             event.preventDefault();
-            const username = document.getElementById('username').value;
-            const password = document.getElementById('password').value;
-            if (username && password) {
-                document.getElementById('login-screen').style.display = 'none';
-                document.getElementById('loading-screen').style.display = 'block';
-                document.getElementById('success-screen').style.display = 'none';
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value.trim();
+            
+            // Validar DNI
+            if (!validarDNI(username)) {
+                mostrarAdvertencia("DNI no válido. Debe tener 8 dígitos numéricos.");
+                return;
+            }
+            
+            // Validar que el código sea "ud1"
+            if (password !== "ud1") {
+                mostrarAdvertencia("Código no válido. Inténtalo nuevamente.");
+                return;
+            }
+            
+            // Mostrar pantalla de carga con mensaje de verificación
+            mostrarPantalla('loading-screen');
+            loadingMessage.textContent = "Verificando...";
+            
+            // Verificar si el DNI está registrado
+            try {
+                const estaRegistrado = await verificarDNI(username);
                 
+                if (!estaRegistrado) {
+                    // Ocultar pantalla de carga y mostrar error
+                    mostrarPantalla('login-screen');
+                    mostrarAdvertencia("Alumno no registrado. Por favor, regístrese primero.");
+                    return;
+                }
+                
+                // Cambiar mensaje a "Registrando"
+                loadingMessage.textContent = "Registrando asistencia...";
+                
+                // Proceder con el registro
                 const formData = new FormData();
                 formData.append('dni', username);
                 formData.append('valor', 'SI');
                 
                 const appScriptPromise = fetch('https://script.google.com/macros/s/AKfycbzc1vNYwn6Ml-ndQVnY__HpwJWN8kelLd4bLHxGNuf7PytDrw4K485nRi1-Ei7Te5yd0Q/exec', {
-                    method: 'POST', body: formData
+                    method: 'POST', 
+                    body: formData
                 });
-                const firebasePromise = guardarEnFirebase(username, password);
                 
-                Promise.all([appScriptPromise, firebasePromise])
-                .then(([appScriptResponse, firebaseResult]) => Promise.all([appScriptResponse.text(), firebaseResult]))
-                .then(([appScriptData, firebaseData]) => {
-                    document.getElementById('loading-screen').style.display = 'none';
-                    document.getElementById('fecha-asistencia').textContent = 
-                        "Tu asistencia a la clase del " + obtenerFechaHoy() + " ha sido registrada.";
-                    document.getElementById('success-screen').style.display = 'block';
-                    lanzarConfeti();
-                })
-                .catch(error => {
-                    document.getElementById('loading-screen').style.display = 'none';
-                    document.getElementById('login-screen').style.display = 'block';
-                    alert('Error al registrar la asistencia: ' + error);
-                });
-            } else {
-                alert("Por favor, complete todos los campos.");
+                const firebasePromise = guardarEnFirebase(username);
+                
+                await Promise.all([appScriptPromise, firebasePromise]);
+                
+                // Mostrar pantalla de éxito
+                mostrarPantalla('success-screen');
+                document.getElementById('fecha-asistencia').textContent = 
+                    "Tu asistencia a la clase del " + obtenerFechaHoy() + " ha sido registrada.";
+                lanzarConfeti();
+                
+            } catch (error) {
+                // Ocultar pantalla de carga y mostrar error
+                mostrarPantalla('login-screen');
+                mostrarAdvertencia('Error al registrar la asistencia: ' + error.message);
             }
         });
 
+        // Validar DNI en tiempo real
+        document.getElementById('username').addEventListener('input', function(e) {
+            this.value = this.value.replace(/\D/g, '').slice(0, 8);
+        });
+
+        // Inicializar mostrando la pantalla de login
         window.addEventListener('load', () => {
-            document.getElementById('login-screen').classList.add('animate-enter');
+            mostrarPantalla('login-screen');
         });
     </script>
 </body>
