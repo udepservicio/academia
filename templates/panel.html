@@ -1,6 +1,4 @@
 
-
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -658,9 +656,41 @@
     box-shadow: none;
     outline: none;
   }
+  
+  /* Vista de cuadro de asistencias */
+  .cuadro-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+  }
+  
+  .cuadro-nav {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  
+  .cuadro-title {
+    font-weight: 600;
+    color: var(--primary);
+  }
+  
+  .asistencia-si {
+    background-color: var(--accent);
+    color: white;
+    text-align: center;
+    border-radius: 3px;
+    padding: 3px 5px;
+  }
+  
+  .asistencia-no {
+    background-color: #f8f9fa;
+    text-align: center;
+    border-radius: 3px;
+    padding: 3px 5px;
+  }
     
-  
-  
   .spinner {
     border: 2px solid #f3f3f3;
     border-top: 2px solid var(--primary);
@@ -770,6 +800,17 @@
     .actions-cell .icon-btn {
       margin: 2px;
     }
+    
+    /* Ajustes para el cuadro de asistencias en móviles */
+    .cuadro-header {
+      flex-direction: column;
+      gap: 10px;
+      align-items: flex-start;
+    }
+    
+    .table-container.cuadro-table {
+      overflow-x: auto;
+    }
   }
 </style>
 
@@ -794,19 +835,22 @@
   <!-- Sidebar -->
   <div class="sidebar" id="sidebar">
     <div class="logo">
-      <h1><i class="fas fa-user-graduate"></i> Alumnos</h1>
+      <h1><i class="fas fa-user-graduate"></i> SIGA</h1>
       <button class="menu-toggle" onclick="toggleSidebar()">
         <i class="fas fa-times"></i>
       </button>
     </div>
     
     <div class="tabs">
-      <button class="tab-btn" onclick="cambiarTab('asistencias')">
-        <i class="fas fa-clipboard-check"></i> Asistencias
-      </button>
+      
       <button class="tab-btn active" onclick="cambiarTab('alumnos')">
         <i class="fas fa-users"></i> Alumnos
       </button>
+      
+      <button class="tab-btn" onclick="cambiarTab('asistencias')">
+        <i class="fas fa-clipboard-check"></i> Asistencias
+      </button>      
+      
       <button class="tab-btn" onclick="cambiarTab('estadisticas')">
         <i class="fas fa-chart-pie"></i> Estadísticas
       </button>
@@ -860,20 +904,55 @@
       
       <!-- Contenido para la pestaña de Asistencias -->
       <div id="asistencias-content" style="display: none;">
-        <div class="table-container">
-          <table id="asistenciasTable">
-            <thead>
-              <tr>
-                <th>Nombre</th>
-                <th>DNI</th>
-                <th>Total Asistencias</th>
-                <th>Última Asistencia</th>
-                <th>Acciones</th>
-              </tr>
-            </thead>
-            <tbody id="asistenciasBody">
-            </tbody>
-          </table>
+        <div class="actions">
+          <button class="btn btn-info" onclick="cambiarVistaAsistencias('resumen')">
+            <i class="fas fa-list"></i> Vista Resumen
+          </button>
+          <button class="btn btn-info" onclick="cambiarVistaAsistencias('cuadro')">
+            <i class="fas fa-table"></i> Vista Cuadro
+          </button>
+          <button class="btn btn-primary" onclick="cambiarSemana(-1)">
+            <i class="fas fa-chevron-left"></i> Semana Anterior
+          </button>
+          <button class="btn btn-primary" onclick="cambiarSemana(1)">
+            Semana Siguiente <i class="fas fa-chevron-right"></i>
+          </button>
+        </div>
+        
+        <!-- Vista Resumen -->
+        <div id="vista-resumen">
+          <div class="table-container">
+            <table id="asistenciasTable">
+              <thead>
+                <tr>
+                  <th>Nombre</th>
+                  <th>DNI</th>
+                  <th>Total Asistencias</th>
+                  <th>Última Asistencia</th>
+                  <th>Acciones</th>
+                </tr>
+              </thead>
+              <tbody id="asistenciasBody">
+              </tbody>
+            </table>
+          </div>
+        </div>
+        
+        <!-- Vista Cuadro -->
+        <div id="vista-cuadro" style="display: none;">
+          <div class="cuadro-header">
+            <div class="cuadro-nav">
+              <span class="cuadro-title" id="rango-fechas">Cargando...</span>
+            </div>
+          </div>
+          <div class="table-container cuadro-table">
+            <table id="cuadroAsistenciasTable">
+              <thead id="cuadroAsistenciasHead">
+              </thead>
+              <tbody id="cuadroAsistenciasBody">
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
       
@@ -883,7 +962,6 @@
           <div class="stat-card">
             <div class="stat-card-header">
               <h3>Distribución por Carrera</h3>
-
             </div>
             <div class="chart-container">
               <canvas id="carreraChart"></canvas>
@@ -893,7 +971,6 @@
           <div class="stat-card">
             <div class="stat-card-header">
               <h3>Distribución por Región</h3>
-
             </div>
             <div class="chart-container">
               <canvas id="regionChart"></canvas>
@@ -903,7 +980,6 @@
           <div class="stat-card">
             <div class="stat-card-header">
               <h3>Distribución por Modalidad</h3>
-
             </div>
             <div class="chart-container">
               <canvas id="modalidadChart"></canvas>
@@ -1009,6 +1085,14 @@
   let totalPages = 1;
   const limit = 50;
 
+  // Variables para la vista de cuadro de asistencias
+  let fechaInicioSemana = new Date();
+  let vistaAsistenciasActual = 'resumen'; // 'resumen' o 'cuadro'
+
+  // Ajustar la fecha al inicio de la semana (lunes)
+  fechaInicioSemana.setDate(fechaInicioSemana.getDate() - fechaInicioSemana.getDay() + (fechaInicioSemana.getDay() === 0 ? -6 : 1));
+  fechaInicioSemana.setHours(0, 0, 0, 0);
+
   // Referencias a elementos del DOM
   const saveBtn = document.getElementById("saveBtn");
   const loadingIndicator = document.getElementById("loadingIndicator");
@@ -1026,6 +1110,9 @@
   const prevPageBtn = document.getElementById("prevPage");
   const nextPageBtn = document.getElementById("nextPage");
   const pageInfo = document.getElementById("pageInfo");
+  const vistaResumen = document.getElementById("vista-resumen");
+  const vistaCuadro = document.getElementById("vista-cuadro");
+  const rangoFechas = document.getElementById("rango-fechas");
 
   // Variable para navegación del calendario
   let currentCalendarMonth = new Date().getMonth();
@@ -1086,6 +1173,26 @@
     // En móvil, cerrar el sidebar al cambiar de pestaña
     if (window.innerWidth <= 900) {
       sidebar.classList.remove('active');
+    }
+  }
+
+  function cambiarVistaAsistencias(vista) {
+    vistaAsistenciasActual = vista;
+    
+    if (vista === 'resumen') {
+      vistaResumen.style.display = 'block';
+      vistaCuadro.style.display = 'none';
+    } else {
+      vistaResumen.style.display = 'none';
+      vistaCuadro.style.display = 'block';
+      cargarCuadroAsistencias();
+    }
+  }
+
+  function cambiarSemana(direccion) {
+    fechaInicioSemana.setDate(fechaInicioSemana.getDate() + (direccion * 7));
+    if (vistaAsistenciasActual === 'cuadro') {
+      cargarCuadroAsistencias();
     }
   }
 
@@ -1295,6 +1402,13 @@
       // Procesar datos para mostrar asistencias por alumno
       procesarAsistenciasPorAlumno();
       loadingIndicator.style.display = "none";
+      
+      // Mostrar la vista actual
+      if (vistaAsistenciasActual === 'resumen') {
+        mostrarAsistenciasPorAlumno();
+      } else {
+        cargarCuadroAsistencias();
+      }
     }).catch(error => {
       loadingIndicator.style.display = "none";
       console.error("Error cargando asistencias: ", error);
@@ -1336,9 +1450,6 @@
         }
       }
     });
-    
-    // Mostrar los datos en la tabla
-    mostrarAsistenciasPorAlumno();
   }
 
   function mostrarAsistenciasPorAlumno() {
@@ -1369,6 +1480,58 @@
       
       asistenciasBody.appendChild(tr);
     });
+  }
+
+  function cargarCuadroAsistencias() {
+    const cuadroHead = document.getElementById("cuadroAsistenciasHead");
+    const cuadroBody = document.getElementById("cuadroAsistenciasBody");
+    
+    loadingIndicator.style.display = "block";
+    cuadroHead.innerHTML = "";
+    cuadroBody.innerHTML = "";
+    
+    // Calcular fechas de la semana
+    const fechaFinSemana = new Date(fechaInicioSemana);
+    fechaFinSemana.setDate(fechaInicioSemana.getDate() + 6);
+    
+    // Actualizar el texto del rango de fechas
+    const opciones = { day: '2-digit', month: '2-digit', year: 'numeric' };
+    rangoFechas.textContent = `Semana: ${fechaInicioSemana.toLocaleDateString('es-ES', opciones)} - ${fechaFinSemana.toLocaleDateString('es-ES', opciones)}`;
+    
+    // Crear encabezados de la tabla
+    let trHead = "<tr><th>Alumno</th><th>DNI</th>";
+    const diasSemana = [];
+    
+    for (let i = 0; i < 7; i++) {
+      const fecha = new Date(fechaInicioSemana);
+      fecha.setDate(fechaInicioSemana.getDate() + i);
+      const fechaStr = fecha.toISOString().split('T')[0];
+      diasSemana.push(fechaStr);
+      
+      trHead += `<th>${fecha.toLocaleDateString('es-ES', { weekday: 'short', day: 'numeric', month: 'short' })}</th>`;
+    }
+    
+    trHead += "</tr>";
+    cuadroHead.innerHTML = trHead;
+    
+    // Crear filas para cada alumno
+    alumnosData.forEach(alumno => {
+      const dni = alumno.dni;
+      const asistencias = asistenciasPorAlumno[dni] || { total: 0, ultimaFecha: null, fechas: new Set() };
+      
+      let tr = `<tr><td>${alumno.nombre || 'No especificado'}</td><td>${dni || 'No especificado'}</td>`;
+      
+      // Para cada día de la semana, verificar asistencia
+      diasSemana.forEach(dia => {
+        const asistio = asistencias.fechas.has(dia);
+        tr += `<td class="${asistio ? 'asistencia-si' : 'asistencia-no'}">${asistio ? 'SI' : 'NO'}</td>`;
+      });
+      
+      tr += "</tr>";
+      cuadroBody.innerHTML += tr;
+    });
+    
+    loadingIndicator.style.display = "none";
   }
 
   function mostrarCalendarioAsistencias(dni, nombre) {
@@ -1552,7 +1715,7 @@
       // Sumar el resto
       const otrosValue = dataArray.slice(5).reduce((sum, item) => sum + item.value, 0);
       
-      // Reconstruir labels y values
+      // Reconstruir labels and values
       labels = top5.map(item => item.label);
       values = top5.map(item => item.value);
       
@@ -1658,78 +1821,74 @@
     }
   }
 
-
   function verDetallesAlumno(userId) {
-      console.log("Intentando ver detalles del ID:", userId);
-      loadingIndicator.style.display = "block";
-      
-      // Obtener datos del alumno desde la colección "registros"
-      db.collection('registros').doc(userId).get().then(userDoc => {
-          if (!userDoc.exists) {
-              showNotification("Alumno no encontrado", "error");
-              loadingIndicator.style.display = "none";
-              return;
-          }
-          
-          const userData = userDoc.data();
-          console.log("Datos del alumno:", userData);
-          
-          // Construir el modal con la información del alumno
-          userModalBody.innerHTML = `
-              <div class="user-info">
-                  <div class="info-item">
-                      <div class="info-label">ID del Documento</div>
-                      <div class="info-value">${userId}</div>
-                  </div>
-                  
-                  <div class="info-item">
-                      <div class="info-label">Nombre</div>
-                      <div class="info-value">${userData.nombre || 'No especificado'}</div>
-                  </div>
-                  
-                  <div class="info-item">
-                      <div class="info-label">DNI</div>
-                      <div class="info-value">${userData.dni || 'No especificado'}</div>
-                  </div>
-                  
-                  <div class="info-item">
-                      <div class="info-label">Carrera</div>
-                      <div class="info-value">${userData.carrera || 'No especificado'}</div>
-                  </div>
-                  
-                  <div class="info-item">
-                      <div class="info-label">Región</div>
-                      <div class="info-value">${userData.region || 'No especificado'}</div>
-                  </div>
-                  
-                  <div class="info-item">
-                      <div class="info-label">Modalidad</div>
-                      <div class="info-value">${userData.modalidad || userData.mediidad || 'No especificada'}</div>
-                  </div>
-                  
-                  <div class="info-item">
-                      <div class="info-label">Celular</div>
-                      <div class="info-value">${userData.celular || 'No especificado'}</div>
-                  </div>
+    console.log("Intentando ver detalles del ID:", userId);
+    loadingIndicator.style.display = "block";
+    
+    // Obtener datos del alumno desde la colección "registros"
+    db.collection('registros').doc(userId).get().then(userDoc => {
+        if (!userDoc.exists) {
+            showNotification("Alumno no encontrado", "error");
+            loadingIndicator.style.display = "none";
+            return;
+        }
+        
+        const userData = userDoc.data();
+        console.log("Datos del alumno:", userData);
+        
+        // Construir el modal con la información del alumno
+        userModalBody.innerHTML = `
+            <div class="user-info">
+                
+                <div class="info-item">
+                    <div class="info-label">Nombre</div>
+                    <div class="info-value">${userData.nombre || 'No especificado'}</div>
+                </div>
+                
+                <div class="info-item">
+                    <div class="info-label">DNI</div>
+                    <div class="info-value">${userData.dni || 'No especificado'}</div>
+                </div>
+                
+                <div class="info-item">
+                    <div class="info-label">Carrera</div>
+                    <div class="info-value">${userData.carrera || 'No especificado'}</div>
+                </div>
+                
+                <div class="info-item">
+                    <div class="info-label">Región</div>
+                    <div class="info-value">${userData.region || 'No especificado'}</div>
+                </div>
+                
+                <div class="info-item">
+                    <div class="info-label">Modalidad</div>
+                    <div class="info-value">${userData.modalidad || userData.mediidad || 'No especificada'}</div>
+                </div>
+                
+                <div class="info-item">
+                    <div class="info-label">Celular</div>
+                    <div class="info-value">${userData.celular || 'No especificado'}</div>
+                </div>
+                
 
-                  
-                  <div class="info-item">
-                      <div class="info-label">Fecha de registro</div>
-                      <div class="info-value">${userData.fecha ? (typeof userData.fecha.toDate === 'function' ? userData.fecha.toDate().toLocaleDateString() : userData.fecha) : 'No especificado'}</div>
-                  </div>
-              </div>
-          `;
-          
-          // Mostrar el modal
-          userModal.classList.add('active');
-          loadingIndicator.style.display = "none";
-      })
-      .catch(error => {
-          loadingIndicator.style.display = "none";
-          console.error("Error obteniendo alumno:", error);
-          showNotification("Error obteniendo datos del alumno: " + error.message, "error");
-      });
-  }    
+                
+                <div class="info-item">
+                    <div class="info-label">Fecha de registro</div>
+                    <div class="info-value">${userData.fecha ? (typeof userData.fecha.toDate === 'function' ? userData.fecha.toDate().toLocaleDateString() : userData.fecha) : 'No especificado'}</div>
+                </div>
+            </div>
+        `;
+        
+        // Mostrar el modal
+        userModal.classList.add('active');
+        loadingIndicator.style.display = "none";
+    })
+    .catch(error => {
+        loadingIndicator.style.display = "none";
+        console.error("Error obteniendo alumno:", error);
+        showNotification("Error obteniendo datos del alumno: " + error.message, "error");
+    });
+  }
 
   function closeModal() {
     userModal.classList.remove('active');
@@ -2153,26 +2312,26 @@
   
         XLSX.utils.book_append_sheet(wb, ws, "registros");
   
+
         // Exportar a archivo
         XLSX.writeFile(wb, `registros_${new Date().toISOString().split('T')[0]}.xlsx`);
-  
+
         loadingIndicator.style.display = "none";
         showNotification("Datos exportados correctamente ✅");
-  
+
       }).catch(error => {
         loadingIndicator.style.display = "none";
         console.error("Error obteniendo asistencias: ", error);
         showNotification("Error exportando datos: " + error.message, "error");
       });
-  
+
     }).catch(error => {
       loadingIndicator.style.display = "none";
       console.error("Error exportando datos: ", error);
       showNotification("Error exportando datos: " + error.message, "error");
     });
   }
-    
- 
+
   // Confirmar antes de salir si hay cambios sin guardar
   window.addEventListener('beforeunload', (e) => {
     if (cambiosPendientes) {
@@ -2210,4 +2369,4 @@
 </script>
 
 </body>
-</html>
+</html>        
